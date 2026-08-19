@@ -1,0 +1,129 @@
+{
+    "analyses": [
+        {
+            "id": "sunset",
+            "scene": "Sunset Beach",
+            "description": "A warm sunset over a peaceful coastal environment.",
+            "mood": [
+                "Calm",
+                "Peaceful",
+                "Dreamy",
+                "Warm"
+            ],
+            "energy": 25,
+            "style": "Cinematic",
+            "music_type": "Ambient",
+            "instruments": [
+                "Soft Piano",
+                "Warm Pads",
+                "Ocean Ambience"
+            ],
+            "music": {
+                "title": "Sunset Dreams",
+                "artist": "AuraTune",
+                "genre": "Ambient Cinematic",
+                "duration": "03:42"
+            }
+        },
+        {
+            "id": "mountain",
+            "scene": "Mountain Landscape",
+            "description": "A vast mountain environment with a powerful natural atmosphere.",
+            "mood": [
+                "Adventurous",
+                "Epic",
+                "Peaceful",
+                "Inspirational"
+            ],
+            "energy": 68,
+            "style": "Cinematic",
+            "music_type": "Epic Ambient",
+            "instruments": [
+                "Piano",
+                "Strings",
+                "Cinematic Drums"
+            ],
+            "music": {
+                "title": "Beyond The Peaks",
+                "artist": "AuraTune",
+                "genre": "Epic Cinematic",
+                "duration": "04:12"
+            }
+        },
+        {
+            "id": "city",
+            "scene": "Night City",
+            "description": "A futuristic urban environment filled with lights and energy.",
+            "mood": [
+                "Energetic",
+                "Futuristic",
+                "Mysterious",
+                "Urban"
+            ],
+            "energy": 82,
+            "style": "Electronic",
+            "music_type": "Synthwave",
+            "instruments": [
+                "Synthesizer",
+                "Electronic Bass",
+                "Digital Drums"
+            ],
+            "music": {
+                "title": "Neon Nights",
+                "artist": "AuraTune",
+                "genre": "Synthwave",
+                "duration": "03:56"
+            }
+        },
+        {
+            "id": "rain",
+            "scene": "Rainy Environment",
+            "description": "A quiet rainy environment with a reflective and atmospheric feeling.",
+            "mood": [
+                "Melancholic",
+                "Peaceful",
+                "Reflective",
+                "Atmospheric"
+            ],
+            "energy": 30,
+            "style": "Atmospheric",
+            "music_type": "Lo-Fi Ambient",
+            "instruments": [
+                "Soft Piano",
+                "Rain",
+                "Warm Synth"
+            ],
+            "music": {
+                "title": "Rain Memories",
+                "artist": "AuraTune",
+                "genre": "Lo-Fi Ambient",
+                "duration": "03:28"
+            }
+        },
+        {
+            "id": "forest",
+            "scene": "Forest",
+            "description": "A natural green environment surrounded by trees and peaceful atmosphere.",
+            "mood": [
+                "Natural",
+                "Peaceful",
+                "Refreshing",
+                "Relaxing"
+            ],
+            "energy": 35,
+            "style": "Nature",
+            "music_type": "Organic Ambient",
+            "instruments": [
+                "Acoustic Guitar",
+                "Flute",
+                "Nature Sounds"
+            ],
+            "music": {
+                "title": "Forest Whisper",
+                "artist": "AuraTune",
+                "genre": "Nature Ambient",
+                "duration": "04:05"
+            }
+        }
+    ]
+}

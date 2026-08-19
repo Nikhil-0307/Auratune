@@ -1,686 +1,1385 @@
-/* =========================
-   AURATUNE
-   Main JavaScript
-========================= */
+/* =========================================================
+   AURATUNE — INTERACTIVE 3D EXPERIENCE
+   Image Upload + JSON Analysis
+   ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
 
-    /* =========================
-       ELEMENTS
-    ========================== */
+/* =========================================================
+   ANALYSIS DATA
+   Loaded from analysis.json
+   ========================================================= */
 
-    const imageInput = document.getElementById("imageInput");
-    const uploadBox = document.getElementById("uploadBox");
+let analysisData = null;
 
-    const previewContainer =
-        document.getElementById("previewContainer");
 
-    const imagePreview =
-        document.getElementById("imagePreview");
+/* =========================================================
+   LOAD ANALYSIS JSON
+   ========================================================= */
 
-    const removeBtn =
-        document.getElementById("removeBtn");
+async function loadAnalysisData() {
 
-    const analyzeBtn =
-        document.getElementById("analyzeBtn");
+    try {
 
-    const resultSection =
-        document.getElementById("resultSection");
+        const response =
+            await fetch("./analysis.json");
 
-    const resultImage =
-        document.getElementById("resultImage");
+        if (!response.ok) {
 
-    const sceneText =
-        document.getElementById("sceneText");
-
-    const playBtn =
-        document.getElementById("playBtn");
-
-    const themeBtn =
-        document.getElementById("themeBtn");
-
-
-    /* =========================
-       MUSIC
-    ========================== */
-
-    let audio = null;
-    let currentMusic = null;
-
-
-    /*
-       Demo music files.
-
-       Create these files inside:
-
-       AuraTune/
-       └── assets/
-           └── music/
-
-       calm.mp3
-       happy.mp3
-       cinematic.mp3
-       energetic.mp3
-    */
-
-    const musicLibrary = {
-        calm: "assets/music/calm.mp3",
-        happy: "assets/music/happy.mp3",
-        cinematic: "assets/music/cinematic.mp3",
-        energetic: "assets/music/energetic.mp3"
-    };
-
-
-    /* =========================
-       IMAGE UPLOAD
-    ========================== */
-
-    imageInput.addEventListener("change", (event) => {
-
-        const file = event.target.files[0];
-
-        if (file) {
-            handleImage(file);
-        }
-
-    });
-
-
-    /* =========================
-       HANDLE IMAGE
-    ========================== */
-
-    function handleImage(file) {
-
-        if (!file.type.startsWith("image/")) {
-
-            alert("Please select a valid image file.");
-
-            return;
-        }
-
-
-        const reader = new FileReader();
-
-
-        reader.onload = (event) => {
-
-            imagePreview.src = event.target.result;
-
-            resultImage.src = event.target.result;
-
-            previewContainer.hidden = false;
-
-            resultSection.hidden = true;
-
-        };
-
-
-        reader.readAsDataURL(file);
-    }
-
-
-    /* =========================
-       DRAG & DROP
-    ========================== */
-
-    uploadBox.addEventListener("dragover", (event) => {
-
-        event.preventDefault();
-
-        uploadBox.classList.add("dragging");
-
-    });
-
-
-    uploadBox.addEventListener("dragleave", () => {
-
-        uploadBox.classList.remove("dragging");
-
-    });
-
-
-    uploadBox.addEventListener("drop", (event) => {
-
-        event.preventDefault();
-
-        uploadBox.classList.remove("dragging");
-
-
-        const file =
-            event.dataTransfer.files[0];
-
-
-        if (file) {
-
-            imageInput.files =
-                event.dataTransfer.files;
-
-            handleImage(file);
+            throw new Error(
+                "Could not load analysis.json"
+            );
 
         }
 
-    });
-
-
-    /* =========================
-       REMOVE IMAGE
-    ========================== */
-
-    removeBtn.addEventListener("click", () => {
-
-        imageInput.value = "";
-
-        imagePreview.src = "";
-
-        resultImage.src = "";
-
-        previewContainer.hidden = true;
-
-        resultSection.hidden = true;
-
-        stopMusic();
-
-    });
-
-
-    /* =========================
-       DEMO AI ANALYSIS
-    ========================== */
-
-    analyzeBtn.addEventListener("click", () => {
-
-        if (!imagePreview.src) {
-
-            alert("Please upload an image first.");
-
-            return;
-        }
-
-
-        analyzeBtn.disabled = true;
-
-        analyzeBtn.textContent =
-            "✨ Analyzing...";
-
-
-        /*
-           This is currently a DEMO.
-
-           Later we will replace this with:
-
-           Image
-             ↓
-           AI Vision API
-             ↓
-           Scene + Mood
-             ↓
-           Music recommendation
-        */
-
-
-        setTimeout(() => {
-
-            const result =
-                generateDemoAnalysis();
-
-
-            updateResult(result);
-
-
-            resultSection.hidden = false;
-
-
-            resultSection.scrollIntoView({
-                behavior: "smooth"
-            });
-
-
-            analyzeBtn.disabled = false;
-
-            analyzeBtn.textContent =
-                "✨ Analyze Image";
-
-        }, 1200);
-
-    });
-
-
-    /* =========================
-       DEMO ANALYSIS ENGINE
-    ========================== */
-
-    function generateDemoAnalysis() {
-
-        const fileName =
-            imageInput.files[0]?.name.toLowerCase() || "";
-
-
-        /*
-           Temporary keyword-based system.
-
-           Example:
-
-           sunset.jpg
-           beach.png
-           mountain.jpg
-           party.png
-        */
-
-
-        if (
-            fileName.includes("sunset") ||
-            fileName.includes("sunrise") ||
-            fileName.includes("sky")
-        ) {
-
-            return {
-
-                scene: "Dreamy Sunset",
-
-                mood: "Peaceful",
-
-                tags: [
-                    "Peaceful",
-                    "Dreamy",
-                    "Warm"
-                ],
-
-                peaceful: 90,
-                dreamy: 88,
-                energetic: 25,
-
-                music: "calm",
-
-                musicTitle: "Golden Hour",
-
-                musicType: "Calm · Ambient"
-
-            };
-
-        }
-
-
-        if (
-            fileName.includes("beach") ||
-            fileName.includes("sea") ||
-            fileName.includes("ocean")
-        ) {
-
-            return {
-
-                scene: "Ocean Escape",
-
-                mood: "Relaxing",
-
-                tags: [
-                    "Relaxing",
-                    "Fresh",
-                    "Peaceful"
-                ],
-
-                peaceful: 92,
-                dreamy: 80,
-                energetic: 40,
-
-                music: "calm",
-
-                musicTitle: "Ocean Breeze",
-
-                musicType: "Ambient · Relaxing"
-
-            };
-
-        }
-
-
-        if (
-            fileName.includes("mountain") ||
-            fileName.includes("hill") ||
-            fileName.includes("travel")
-        ) {
-
-            return {
-
-                scene: "Adventure Landscape",
-
-                mood: "Cinematic",
-
-                tags: [
-                    "Adventure",
-                    "Cinematic",
-                    "Epic"
-                ],
-
-                peaceful: 55,
-                dreamy: 70,
-                energetic: 82,
-
-                music: "cinematic",
-
-                musicTitle: "Beyond the Horizon",
-
-                musicType: "Cinematic · Atmospheric"
-
-            };
-
-        }
-
-
-        if (
-            fileName.includes("party") ||
-            fileName.includes("dance") ||
-            fileName.includes("festival")
-        ) {
-
-            return {
-
-                scene: "Celebration",
-
-                mood: "Energetic",
-
-                tags: [
-                    "Energetic",
-                    "Happy",
-                    "Fun"
-                ],
-
-                peaceful: 25,
-                dreamy: 45,
-                energetic: 96,
-
-                music: "energetic",
-
-                musicTitle: "Good Vibes",
-
-                musicType: "Energetic · Electronic"
-
-            };
-
-        }
-
-
-        /*
-           Default result
-        */
-
-        return {
-
-            scene: "Beautiful Moment",
-
-            mood: "Dreamy",
-
-            tags: [
-                "Dreamy",
-                "Calm",
-                "Atmospheric"
-            ],
-
-            peaceful: 78,
-            dreamy: 85,
-            energetic: 42,
-
-            music: "calm",
-
-            musicTitle: "Aura Reflection",
-
-            musicType: "Calm · Ambient"
-
-        };
+        analysisData =
+            await response.json();
+
+        console.log(
+            "AuraTune JSON loaded:",
+            analysisData
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Error loading analysis.json:",
+            error
+        );
 
     }
 
+}
 
-    /* =========================
-       UPDATE RESULT
-    ========================== */
-
-    function updateResult(result) {
-
-        sceneText.textContent =
-            result.scene;
+loadAnalysisData();
 
 
-        /* -------------------------
-           Mood Tags
-        ------------------------- */
+/* =========================================================
+   MAIN APPLICATION
+   ========================================================= */
 
-        const moodTags =
-            document.querySelector(".mood-tags");
-
-
-        moodTags.innerHTML = "";
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
 
-        result.tags.forEach(tag => {
+        /* =====================================================
+           ELEMENTS
+        ===================================================== */
 
-            const span =
-                document.createElement("span");
+        const heroVisual =
+            document.getElementById(
+                "heroVisual"
+            );
 
-            span.textContent = tag;
+        const floatingFrame =
+            document.querySelector(
+                ".floating-frame"
+            );
 
-            moodTags.appendChild(span);
+        const dataTop =
+            document.querySelector(
+                ".data-top"
+            );
 
-        });
+        const dataBottom =
+            document.querySelector(
+                ".data-bottom"
+            );
 
-
-        /* -------------------------
-           Mood Bars
-        ------------------------- */
-
-        const progressBars =
+        const particles =
             document.querySelectorAll(
-                ".progress-fill"
+                ".particle"
+            );
+
+        const rings =
+            document.querySelectorAll(
+                ".sound-ring"
             );
 
 
-        if (progressBars.length >= 3) {
+        /* =====================================================
+           THEME
+        ===================================================== */
 
-            progressBars[0].style.width =
-                result.peaceful + "%";
+        const themeBtn =
+            document.getElementById(
+                "themeBtn"
+            );
 
-            progressBars[1].style.width =
-                result.dreamy + "%";
 
-            progressBars[2].style.width =
-                result.energetic + "%";
+        /* =====================================================
+           IMAGE UPLOAD
+        ===================================================== */
+
+        const imageInput =
+            document.getElementById(
+                "imageInput"
+            );
+
+        const uploadBox =
+            document.getElementById(
+                "uploadBox"
+            );
+
+        const previewContainer =
+            document.getElementById(
+                "previewContainer"
+            );
+
+        const imagePreview =
+            document.getElementById(
+                "imagePreview"
+            );
+
+        const removeBtn =
+            document.getElementById(
+                "removeBtn"
+            );
+
+
+        /* =====================================================
+           ANALYSIS
+        ===================================================== */
+
+        const analyzeBtn =
+            document.getElementById(
+                "analyzeBtn"
+            );
+
+        const resultSection =
+            document.getElementById(
+                "resultSection"
+            );
+
+        const resultImage =
+            document.getElementById(
+                "resultImage"
+            );
+
+        const sceneText =
+            document.getElementById(
+                "sceneText"
+            );
+
+
+        /* =====================================================
+           MUSIC
+        ===================================================== */
+
+        const playBtn =
+            document.getElementById(
+                "playBtn"
+            );
+
+
+        /* =====================================================
+           VARIABLES
+        ===================================================== */
+
+        let selectedAnalysis = null;
+
+        let currentImageURL = null;
+
+        let playing = false;
+
+
+        /* =====================================================
+           REDUCED MOTION
+        ===================================================== */
+
+        const reducedMotion =
+            window.matchMedia(
+                "(prefers-reduced-motion: reduce)"
+            ).matches;
+
+
+        /* =====================================================
+           3D MOUSE MOVEMENT
+        ===================================================== */
+
+        if (
+            heroVisual &&
+            floatingFrame &&
+            !reducedMotion &&
+            window.matchMedia(
+                "(pointer: fine)"
+            ).matches
+        ) {
+
+            let mouseX = 0;
+
+            let mouseY = 0;
+
+            let currentX = 0;
+
+            let currentY = 0;
+
+
+            /* -------------------------------------------------
+               MOUSE MOVE
+            ------------------------------------------------- */
+
+            heroVisual.addEventListener(
+                "mousemove",
+                (event) => {
+
+                    const rect =
+                        heroVisual.getBoundingClientRect();
+
+
+                    /*
+                     * Convert mouse position
+                     * to -1 → +1
+                     */
+
+                    mouseX =
+                        (
+                            (
+                                event.clientX -
+                                rect.left
+                            ) /
+                            rect.width
+                        ) * 2 - 1;
+
+
+                    mouseY =
+                        (
+                            (
+                                event.clientY -
+                                rect.top
+                            ) /
+                            rect.height
+                        ) * 2 - 1;
+
+                }
+            );
+
+
+            /* -------------------------------------------------
+               MOUSE LEAVE
+            ------------------------------------------------- */
+
+            heroVisual.addEventListener(
+                "mouseleave",
+                () => {
+
+                    mouseX = 0;
+
+                    mouseY = 0;
+
+                }
+            );
+
+
+            /* -------------------------------------------------
+               3D ANIMATION
+            ------------------------------------------------- */
+
+            function animate3D() {
+
+                currentX +=
+                    (
+                        mouseX -
+                        currentX
+                    ) * 0.06;
+
+
+                currentY +=
+                    (
+                        mouseY -
+                        currentY
+                    ) * 0.06;
+
+
+                /* Main card */
+
+                const rotateY =
+                    currentX * 14;
+
+
+                const rotateX =
+                    currentY * -10;
+
+
+                const translateX =
+                    currentX * 8;
+
+
+                const translateY =
+                    currentY * 6;
+
+
+                floatingFrame.style.transform = `
+                    translate3d(
+                        ${translateX}px,
+                        ${translateY}px,
+                        0
+                    )
+                    rotateY(${rotateY - 8}deg)
+                    rotateX(${rotateX + 5}deg)
+                    rotateZ(${currentX * 1.5}deg)
+                `;
+
+
+                /* Top information card */
+
+                if (dataTop) {
+
+                    dataTop.style.transform = `
+                        translate3d(
+                            ${currentX * 25}px,
+                            ${currentY * 20}px,
+                            80px
+                        )
+                    `;
+
+                }
+
+
+                /* Bottom information card */
+
+                if (dataBottom) {
+
+                    dataBottom.style.transform = `
+                        translate3d(
+                            ${currentX * -20}px,
+                            ${currentY * -16}px,
+                            60px
+                        )
+                    `;
+
+                }
+
+
+                /* Particles */
+
+                particles.forEach(
+                    (particle, index) => {
+
+                        const depth =
+                            (index + 1) * 5;
+
+
+                        particle.style.transform = `
+                            translate3d(
+                                ${currentX * depth}px,
+                                ${currentY * depth}px,
+                                0
+                            )
+                        `;
+
+                    }
+                );
+
+
+                /* Sound rings */
+
+                rings.forEach(
+                    (ring, index) => {
+
+                        const depth =
+                            (index + 1) * 2;
+
+
+                        ring.style.transform = `
+                            translate3d(
+                                ${currentX * depth}px,
+                                ${currentY * depth}px,
+                                0
+                            )
+                        `;
+
+                    }
+                );
+
+
+                requestAnimationFrame(
+                    animate3D
+                );
+
+            }
+
+
+            animate3D();
+
+
+            /* -------------------------------------------------
+               CURSOR
+            ------------------------------------------------- */
+
+            heroVisual.addEventListener(
+                "mouseenter",
+                () => {
+
+                    heroVisual.style.cursor =
+                        "crosshair";
+
+                }
+            );
 
         }
 
 
-        /* -------------------------
-           Music Information
-        ------------------------- */
+        /* =====================================================
+           THEME TOGGLE
+        ===================================================== */
 
-        const musicTitle =
-            document.querySelector(
-                ".music-title"
-            );
+        if (themeBtn) {
 
-        const musicType =
-            document.querySelector(
-                ".music-type"
-            );
+            themeBtn.addEventListener(
+                "click",
+                () => {
 
-
-        musicTitle.textContent =
-            result.musicTitle;
-
-        musicType.textContent =
-            result.musicType;
-
-
-        /* -------------------------
-           Load Music
-        ------------------------- */
-
-        loadMusic(result.music);
-
-    }
-
-
-    /* =========================
-       LOAD MUSIC
-    ========================== */
-
-    function loadMusic(type) {
-
-        stopMusic();
-
-
-        currentMusic =
-            musicLibrary[type];
-
-
-        audio =
-            new Audio(currentMusic);
-
-
-        audio.loop = true;
-
-
-        playBtn.textContent = "▶";
-
-    }
-
-
-    /* =========================
-       PLAY / PAUSE
-    ========================== */
-
-    playBtn.addEventListener("click", () => {
-
-        if (!audio) {
-
-            alert(
-                "Please analyze an image first."
-            );
-
-            return;
-        }
-
-
-        if (audio.paused) {
-
-            audio.play()
-                .then(() => {
-
-                    playBtn.textContent = "❚❚";
-
-                })
-                .catch(() => {
-
-                    alert(
-                        "Add your BGM files to assets/music first."
+                    document.body.classList.toggle(
+                        "light-mode"
                     );
 
-                });
 
-        } else {
-
-            audio.pause();
-
-            playBtn.textContent = "▶";
-
-        }
-
-    });
+                    const lightMode =
+                        document.body.classList.contains(
+                            "light-mode"
+                        );
 
 
-    /* =========================
-       STOP MUSIC
-    ========================== */
-
-    function stopMusic() {
-
-        if (audio) {
-
-            audio.pause();
-
-            audio.currentTime = 0;
-
-            audio = null;
-
-        }
+                    themeBtn.textContent =
+                        lightMode
+                            ? "☀"
+                            : "◐";
 
 
-        playBtn.textContent = "▶";
+                    localStorage.setItem(
+                        "auratune-theme",
+                        lightMode
+                            ? "light"
+                            : "dark"
+                    );
 
-    }
-
-
-    /* =========================
-       THEME TOGGLE
-    ========================== */
-
-    themeBtn.addEventListener("click", () => {
-
-        document.body.classList.toggle(
-            "light-mode"
-        );
-
-
-        const lightMode =
-            document.body.classList.contains(
-                "light-mode"
+                }
             );
 
 
-        themeBtn.textContent =
-            lightMode ? "☀" : "◐";
+            /* Restore saved theme */
 
+            const savedTheme =
+                localStorage.getItem(
+                    "auratune-theme"
+                );
 
-        localStorage.setItem(
-            "auratune-theme",
-            lightMode ? "light" : "dark"
-        );
-
-    });
-
-
-    /* =========================
-       REMEMBER THEME
-    ========================== */
-
-    const savedTheme =
-        localStorage.getItem(
-            "auratune-theme"
-        );
-
-
-    if (savedTheme === "light") {
-
-        document.body.classList.add(
-            "light-mode"
-        );
-
-        themeBtn.textContent = "☀";
-
-    }
-
-
-    /* =========================
-       KEYBOARD SHORTCUT
-    ========================== */
-
-    document.addEventListener(
-        "keydown",
-        (event) => {
-
-            /*
-               Press Escape to remove image
-            */
 
             if (
-                event.key === "Escape" &&
-                !previewContainer.hidden
+                savedTheme === "light"
             ) {
 
-                removeBtn.click();
+                document.body.classList.add(
+                    "light-mode"
+                );
+
+
+                themeBtn.textContent =
+                    "☀";
 
             }
 
         }
-    );
 
-});
+
+        /* =====================================================
+           IMAGE UPLOAD
+        ===================================================== */
+
+        if (imageInput) {
+
+            imageInput.addEventListener(
+                "change",
+                handleImageUpload
+            );
+
+        }
+
+
+        function handleImageUpload(event) {
+
+            const file =
+                event.target.files[0];
+
+
+            if (!file) {
+
+                return;
+
+            }
+
+
+            /* Check image */
+
+            if (
+                !file.type.startsWith(
+                    "image/"
+                )
+            ) {
+
+                alert(
+                    "Please upload a valid image."
+                );
+
+                return;
+
+            }
+
+
+            /* Remove previous URL */
+
+            if (currentImageURL) {
+
+                URL.revokeObjectURL(
+                    currentImageURL
+                );
+
+            }
+
+
+            /* Create image URL */
+
+            currentImageURL =
+                URL.createObjectURL(
+                    file
+                );
+
+
+            imagePreview.src =
+                currentImageURL;
+
+
+            /* Show preview */
+
+            if (uploadBox) {
+
+                uploadBox.hidden =
+                    true;
+
+            }
+
+
+            if (previewContainer) {
+
+                previewContainer.hidden =
+                    false;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           REMOVE IMAGE
+        ===================================================== */
+
+        if (removeBtn) {
+
+            removeBtn.addEventListener(
+                "click",
+                resetUpload
+            );
+
+        }
+
+
+        function resetUpload() {
+
+            if (imageInput) {
+
+                imageInput.value = "";
+
+            }
+
+
+            if (imagePreview) {
+
+                imagePreview.src = "";
+
+            }
+
+
+            if (previewContainer) {
+
+                previewContainer.hidden =
+                    true;
+
+            }
+
+
+            if (uploadBox) {
+
+                uploadBox.hidden =
+                    false;
+
+            }
+
+
+            if (resultSection) {
+
+                resultSection.hidden =
+                    true;
+
+            }
+
+
+            selectedAnalysis =
+                null;
+
+
+            playing =
+                false;
+
+
+            if (playBtn) {
+
+                playBtn.textContent =
+                    "▶";
+
+                playBtn.classList.remove(
+                    "playing"
+                );
+
+            }
+
+
+            if (currentImageURL) {
+
+                URL.revokeObjectURL(
+                    currentImageURL
+                );
+
+                currentImageURL =
+                    null;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           DRAG & DROP
+        ===================================================== */
+
+        if (uploadBox) {
+
+
+            /* Drag over */
+
+            uploadBox.addEventListener(
+                "dragover",
+                (event) => {
+
+                    event.preventDefault();
+
+                    uploadBox.classList.add(
+                        "dragging"
+                    );
+
+                }
+            );
+
+
+            /* Drag leave */
+
+            uploadBox.addEventListener(
+                "dragleave",
+                () => {
+
+                    uploadBox.classList.remove(
+                        "dragging"
+                    );
+
+                }
+            );
+
+
+            /* Drop */
+
+            uploadBox.addEventListener(
+                "drop",
+                (event) => {
+
+                    event.preventDefault();
+
+
+                    uploadBox.classList.remove(
+                        "dragging"
+                    );
+
+
+                    const file =
+                        event.dataTransfer.files[0];
+
+
+                    if (
+                        file &&
+                        file.type.startsWith(
+                            "image/"
+                        )
+                    ) {
+
+                        const dataTransfer =
+                            new DataTransfer();
+
+
+                        dataTransfer.items.add(
+                            file
+                        );
+
+
+                        imageInput.files =
+                            dataTransfer.files;
+
+
+                        handleImageUpload({
+                            target: imageInput
+                        });
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           ANALYZE IMAGE
+        ===================================================== */
+
+        if (analyzeBtn) {
+
+            analyzeBtn.addEventListener(
+                "click",
+                analyzeImage
+            );
+
+        }
+
+
+        async function analyzeImage() {
+
+
+            /* -------------------------------------------------
+               CHECK IMAGE
+            ------------------------------------------------- */
+
+            if (
+                !imagePreview ||
+                !imagePreview.src ||
+                imagePreview.src ===
+                    window.location.href
+            ) {
+
+                alert(
+                    "Please upload an image first."
+                );
+
+                return;
+
+            }
+
+
+            /* -------------------------------------------------
+               CHECK JSON
+            ------------------------------------------------- */
+
+            if (
+                !analysisData ||
+                !analysisData.analyses ||
+                !analysisData.analyses.length
+            ) {
+
+                alert(
+                    "AuraTune analysis data is still loading. Please try again."
+                );
+
+                return;
+
+            }
+
+
+            /* -------------------------------------------------
+               LOADING
+            ------------------------------------------------- */
+
+            analyzeBtn.disabled =
+                true;
+
+
+            analyzeBtn.innerHTML = `
+                <span class="loading-spinner"></span>
+                Reading your aura...
+            `;
+
+
+            /* -------------------------------------------------
+               SIMULATE ANALYSIS
+            ------------------------------------------------- */
+
+            await wait(1800);
+
+
+            /*
+             * For this current version,
+             * AuraTune selects one analysis
+             * from analysis.json.
+             *
+             * Later this will be replaced
+             * with real AI image analysis.
+             */
+
+            selectedAnalysis =
+                selectAnalysis();
+
+
+            /* -------------------------------------------------
+               DISPLAY RESULT
+            ------------------------------------------------- */
+
+            displayAnalysis(
+                selectedAnalysis
+            );
+
+
+            /* -------------------------------------------------
+               SHOW RESULT
+            ------------------------------------------------- */
+
+            if (resultSection) {
+
+                resultSection.hidden =
+                    false;
+
+            }
+
+
+            /* -------------------------------------------------
+               RESET BUTTON
+            ------------------------------------------------- */
+
+            analyzeBtn.disabled =
+                false;
+
+
+            analyzeBtn.innerHTML = `
+                <span>✦</span>
+                Analyze My Image
+                <span>→</span>
+            `;
+
+
+            /* -------------------------------------------------
+               SCROLL TO RESULT
+            ------------------------------------------------- */
+
+            if (resultSection) {
+
+                resultSection.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+            }
+
+        }
+
+
+        /* =====================================================
+           SELECT ANALYSIS
+        ===================================================== */
+
+        function selectAnalysis() {
+
+            const analyses =
+                analysisData.analyses;
+
+
+            /*
+             * Current demo:
+             * randomly selects one result.
+             */
+
+            const randomIndex =
+                Math.floor(
+                    Math.random() *
+                    analyses.length
+                );
+
+
+            return analyses[
+                randomIndex
+            ];
+
+        }
+
+
+        /* =====================================================
+           DISPLAY ANALYSIS
+        ===================================================== */
+
+        function displayAnalysis(
+            analysis
+        ) {
+
+            if (!analysis) {
+
+                return;
+
+            }
+
+
+            /* -------------------------------------------------
+               RESULT IMAGE
+            ------------------------------------------------- */
+
+            if (resultImage) {
+
+                resultImage.src =
+                    imagePreview.src;
+
+            }
+
+
+            /* -------------------------------------------------
+               SCENE
+            ------------------------------------------------- */
+
+            if (sceneText) {
+
+                sceneText.textContent =
+                    analysis.scene;
+
+            }
+
+
+            /* -------------------------------------------------
+               MOOD TAGS
+            ------------------------------------------------- */
+
+            createMoodTags(
+                analysis.mood
+            );
+
+
+            /* -------------------------------------------------
+               MUSIC INFORMATION
+            ------------------------------------------------- */
+
+            updateMusicPlayer(
+                analysis
+            );
+
+
+            /* -------------------------------------------------
+               ANALYSIS DETAILS
+            ------------------------------------------------- */
+
+            updateAnalysisDetails(
+                analysis
+            );
+
+
+            console.log(
+                "AuraTune Analysis:",
+                analysis
+            );
+
+        }
+
+
+        /* =====================================================
+           CREATE MOOD TAGS
+        ===================================================== */
+
+        function createMoodTags(
+            moods
+        ) {
+
+            const moodContainer =
+                document.querySelector(
+                    ".mood-tags"
+                );
+
+
+            if (!moodContainer) {
+
+                return;
+
+            }
+
+
+            moodContainer.innerHTML =
+                "";
+
+
+            if (
+                !Array.isArray(moods)
+            ) {
+
+                return;
+
+            }
+
+
+            moods.forEach(
+                (mood) => {
+
+                    const tag =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    tag.textContent =
+                        mood;
+
+
+                    moodContainer.appendChild(
+                        tag
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           UPDATE MUSIC PLAYER
+        ===================================================== */
+
+        function updateMusicPlayer(
+            analysis
+        ) {
+
+            if (
+                !analysis ||
+                !analysis.music
+            ) {
+
+                return;
+
+            }
+
+
+            const musicTitle =
+                document.querySelector(
+                    ".music-title"
+                );
+
+
+            const musicType =
+                document.querySelector(
+                    ".music-type"
+                );
+
+
+            const musicArtist =
+                document.querySelector(
+                    ".music-artist"
+                );
+
+
+            if (musicTitle) {
+
+                musicTitle.textContent =
+                    analysis.music.title;
+
+            }
+
+
+            if (musicType) {
+
+                musicType.textContent =
+                    `${analysis.music.genre} · ${analysis.music.duration}`;
+
+            }
+
+
+            if (musicArtist) {
+
+                musicArtist.textContent =
+                    analysis.music.artist;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           UPDATE EXTRA ANALYSIS DETAILS
+        ===================================================== */
+
+        function updateAnalysisDetails(
+            analysis
+        ) {
+
+
+            /* -------------------------------------------------
+               Description
+            ------------------------------------------------- */
+
+            const description =
+                document.querySelector(
+                    ".analysis-description"
+                );
+
+
+            if (
+                description &&
+                analysis.description
+            ) {
+
+                description.textContent =
+                    analysis.description;
+
+            }
+
+
+            /* -------------------------------------------------
+               Style
+            ------------------------------------------------- */
+
+            const style =
+                document.querySelector(
+                    ".analysis-style"
+                );
+
+
+            if (
+                style &&
+                analysis.style
+            ) {
+
+                style.textContent =
+                    analysis.style;
+
+            }
+
+
+            /* -------------------------------------------------
+               Music Type
+            ------------------------------------------------- */
+
+            const musicType =
+                document.querySelector(
+                    ".analysis-music-type"
+                );
+
+
+            if (
+                musicType &&
+                analysis.music_type
+            ) {
+
+                musicType.textContent =
+                    analysis.music_type;
+
+            }
+
+
+            /* -------------------------------------------------
+               Energy
+            ------------------------------------------------- */
+
+            const energy =
+                document.querySelector(
+                    ".analysis-energy"
+                );
+
+
+            if (
+                energy &&
+                typeof analysis.energy ===
+                    "number"
+            ) {
+
+                energy.textContent =
+                    `${analysis.energy}%`;
+
+            }
+
+
+            /* -------------------------------------------------
+               Instruments
+            ------------------------------------------------- */
+
+            const instruments =
+                document.querySelector(
+                    ".analysis-instruments"
+                );
+
+
+            if (
+                instruments &&
+                Array.isArray(
+                    analysis.instruments
+                )
+            ) {
+
+                instruments.textContent =
+                    analysis.instruments.join(
+                        " · "
+                    );
+
+            }
+
+        }
+
+
+        /* =====================================================
+           PLAY BUTTON
+        ===================================================== */
+
+        if (playBtn) {
+
+            playBtn.addEventListener(
+                "click",
+                () => {
+
+
+                    /* Check analysis */
+
+                    if (
+                        !selectedAnalysis
+                    ) {
+
+                        alert(
+                            "Analyze an image first."
+                        );
+
+                        return;
+
+                    }
+
+
+                    playing =
+                        !playing;
+
+
+                    if (playing) {
+
+                        playBtn.textContent =
+                            "❚❚";
+
+
+                        playBtn.classList.add(
+                            "playing"
+                        );
+
+
+                        console.log(
+                            "AuraTune selected:",
+                            selectedAnalysis.music
+                        );
+
+
+                    } else {
+
+                        playBtn.textContent =
+                            "▶";
+
+
+                        playBtn.classList.remove(
+                            "playing"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           SCROLL REVEAL
+        ===================================================== */
+
+        const revealElements =
+            document.querySelectorAll(
+                ".process-card, .experience-card, .result-grid, .about-section"
+            );
+
+
+        if (
+            "IntersectionObserver" in window &&
+            !reducedMotion
+        ) {
+
+            const observer =
+                new IntersectionObserver(
+                    (entries) => {
+
+                        entries.forEach(
+                            (entry) => {
+
+                                if (
+                                    entry.isIntersecting
+                                ) {
+
+                                    entry.target.classList.add(
+                                        "revealed"
+                                    );
+
+
+                                    observer.unobserve(
+                                        entry.target
+                                    );
+
+                                }
+
+                            }
+                        );
+
+                    },
+                    {
+                        threshold: 0.12
+                    }
+                );
+
+
+            revealElements.forEach(
+                (element) => {
+
+                    element.classList.add(
+                        "reveal"
+                    );
+
+
+                    observer.observe(
+                        element
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           HELPER — WAIT
+        ===================================================== */
+
+        function wait(
+            milliseconds
+        ) {
+
+            return new Promise(
+                (resolve) => {
+
+                    setTimeout(
+                        resolve,
+                        milliseconds
+                    );
+
+                }
+            );
+
+        }
+
+    }
+);
