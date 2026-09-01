@@ -1,20 +1,19 @@
 /* =========================================================
    AURATUNE — INTERACTIVE 3D EXPERIENCE
-   Image Upload + JSON Analysis
+   Image Upload + AI Analysis + Real Music Playback
    ========================================================= */
 
 
 /* =========================================================
    ANALYSIS DATA
-   Loaded from analysis.json
-   ========================================================= */
+========================================================= */
 
 let analysisData = null;
 
 
 /* =========================================================
    LOAD ANALYSIS JSON
-   ========================================================= */
+========================================================= */
 
 async function loadAnalysisData() {
 
@@ -24,11 +23,9 @@ async function loadAnalysisData() {
             await fetch("./analysis.json");
 
         if (!response.ok) {
-
             throw new Error(
                 "Could not load analysis.json"
             );
-
         }
 
         analysisData =
@@ -55,21 +52,19 @@ loadAnalysisData();
 
 /* =========================================================
    MAIN APPLICATION
-   ========================================================= */
+========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     () => {
 
 
-        /* =====================================================
+        /* =================================================
            ELEMENTS
-        ===================================================== */
+        ================================================= */
 
         const heroVisual =
-            document.getElementById(
-                "heroVisual"
-            );
+            document.getElementById("heroVisual");
 
         const floatingFrame =
             document.querySelector(
@@ -97,9 +92,9 @@ document.addEventListener(
             );
 
 
-        /* =====================================================
+        /* =================================================
            THEME
-        ===================================================== */
+        ================================================= */
 
         const themeBtn =
             document.getElementById(
@@ -107,9 +102,9 @@ document.addEventListener(
             );
 
 
-        /* =====================================================
+        /* =================================================
            IMAGE UPLOAD
-        ===================================================== */
+        ================================================= */
 
         const imageInput =
             document.getElementById(
@@ -137,9 +132,9 @@ document.addEventListener(
             );
 
 
-        /* =====================================================
+        /* =================================================
            ANALYSIS
-        ===================================================== */
+        ================================================= */
 
         const analyzeBtn =
             document.getElementById(
@@ -162,9 +157,9 @@ document.addEventListener(
             );
 
 
-        /* =====================================================
+        /* =================================================
            MUSIC
-        ===================================================== */
+        ================================================= */
 
         const playBtn =
             document.getElementById(
@@ -172,9 +167,9 @@ document.addEventListener(
             );
 
 
-        /* =====================================================
+        /* =================================================
            VARIABLES
-        ===================================================== */
+        ================================================= */
 
         let selectedAnalysis = null;
 
@@ -182,10 +177,15 @@ document.addEventListener(
 
         let playing = false;
 
+        /*
+         * ONLY ONE audioPlayer variable.
+         */
+        let audioPlayer = null;
 
-        /* =====================================================
+
+        /* =================================================
            REDUCED MOTION
-        ===================================================== */
+        ================================================= */
 
         const reducedMotion =
             window.matchMedia(
@@ -193,9 +193,9 @@ document.addEventListener(
             ).matches;
 
 
-        /* =====================================================
+        /* =================================================
            3D MOUSE MOVEMENT
-        ===================================================== */
+        ================================================= */
 
         if (
             heroVisual &&
@@ -207,17 +207,11 @@ document.addEventListener(
         ) {
 
             let mouseX = 0;
-
             let mouseY = 0;
 
             let currentX = 0;
-
             let currentY = 0;
 
-
-            /* -------------------------------------------------
-               MOUSE MOVE
-            ------------------------------------------------- */
 
             heroVisual.addEventListener(
                 "mousemove",
@@ -226,11 +220,6 @@ document.addEventListener(
                     const rect =
                         heroVisual.getBoundingClientRect();
 
-
-                    /*
-                     * Convert mouse position
-                     * to -1 → +1
-                     */
 
                     mouseX =
                         (
@@ -255,43 +244,26 @@ document.addEventListener(
             );
 
 
-            /* -------------------------------------------------
-               MOUSE LEAVE
-            ------------------------------------------------- */
-
             heroVisual.addEventListener(
                 "mouseleave",
                 () => {
 
                     mouseX = 0;
-
                     mouseY = 0;
 
                 }
             );
 
 
-            /* -------------------------------------------------
-               3D ANIMATION
-            ------------------------------------------------- */
-
             function animate3D() {
 
                 currentX +=
-                    (
-                        mouseX -
-                        currentX
-                    ) * 0.06;
+                    (mouseX - currentX) * 0.06;
 
 
                 currentY +=
-                    (
-                        mouseY -
-                        currentY
-                    ) * 0.06;
+                    (mouseY - currentY) * 0.06;
 
-
-                /* Main card */
 
                 const rotateY =
                     currentX * 14;
@@ -321,8 +293,6 @@ document.addEventListener(
                 `;
 
 
-                /* Top information card */
-
                 if (dataTop) {
 
                     dataTop.style.transform = `
@@ -336,8 +306,6 @@ document.addEventListener(
                 }
 
 
-                /* Bottom information card */
-
                 if (dataBottom) {
 
                     dataBottom.style.transform = `
@@ -350,8 +318,6 @@ document.addEventListener(
 
                 }
 
-
-                /* Particles */
 
                 particles.forEach(
                     (particle, index) => {
@@ -371,8 +337,6 @@ document.addEventListener(
                     }
                 );
 
-
-                /* Sound rings */
 
                 rings.forEach(
                     (ring, index) => {
@@ -403,10 +367,6 @@ document.addEventListener(
             animate3D();
 
 
-            /* -------------------------------------------------
-               CURSOR
-            ------------------------------------------------- */
-
             heroVisual.addEventListener(
                 "mouseenter",
                 () => {
@@ -420,9 +380,9 @@ document.addEventListener(
         }
 
 
-        /* =====================================================
+        /* =================================================
            THEME TOGGLE
-        ===================================================== */
+        ================================================= */
 
         if (themeBtn) {
 
@@ -458,34 +418,28 @@ document.addEventListener(
             );
 
 
-            /* Restore saved theme */
-
             const savedTheme =
                 localStorage.getItem(
                     "auratune-theme"
                 );
 
 
-            if (
-                savedTheme === "light"
-            ) {
+            if (savedTheme === "light") {
 
                 document.body.classList.add(
                     "light-mode"
                 );
 
-
-                themeBtn.textContent =
-                    "☀";
+                themeBtn.textContent = "☀";
 
             }
 
         }
 
 
-        /* =====================================================
+        /* =================================================
            IMAGE UPLOAD
-        ===================================================== */
+        ================================================= */
 
         if (imageInput) {
 
@@ -504,19 +458,11 @@ document.addEventListener(
 
 
             if (!file) {
-
                 return;
-
             }
 
 
-            /* Check image */
-
-            if (
-                !file.type.startsWith(
-                    "image/"
-                )
-            ) {
+            if (!file.type.startsWith("image/")) {
 
                 alert(
                     "Please upload a valid image."
@@ -527,8 +473,6 @@ document.addEventListener(
             }
 
 
-            /* Remove previous URL */
-
             if (currentImageURL) {
 
                 URL.revokeObjectURL(
@@ -538,41 +482,33 @@ document.addEventListener(
             }
 
 
-            /* Create image URL */
-
             currentImageURL =
-                URL.createObjectURL(
-                    file
-                );
+                URL.createObjectURL(file);
 
 
             imagePreview.src =
                 currentImageURL;
 
 
-            /* Show preview */
-
             if (uploadBox) {
 
-                uploadBox.hidden =
-                    true;
+                uploadBox.hidden = true;
 
             }
 
 
             if (previewContainer) {
 
-                previewContainer.hidden =
-                    false;
+                previewContainer.hidden = false;
 
             }
 
         }
 
 
-        /* =====================================================
+        /* =================================================
            REMOVE IMAGE
-        ===================================================== */
+        ================================================= */
 
         if (removeBtn) {
 
@@ -586,56 +522,42 @@ document.addEventListener(
 
         function resetUpload() {
 
+            stopMusic();
+
+
             if (imageInput) {
-
                 imageInput.value = "";
-
             }
 
 
             if (imagePreview) {
-
                 imagePreview.src = "";
-
             }
 
 
             if (previewContainer) {
-
-                previewContainer.hidden =
-                    true;
-
+                previewContainer.hidden = true;
             }
 
 
             if (uploadBox) {
-
-                uploadBox.hidden =
-                    false;
-
+                uploadBox.hidden = false;
             }
 
 
             if (resultSection) {
-
-                resultSection.hidden =
-                    true;
-
+                resultSection.hidden = true;
             }
 
 
-            selectedAnalysis =
-                null;
+            selectedAnalysis = null;
 
-
-            playing =
-                false;
+            playing = false;
 
 
             if (playBtn) {
 
-                playBtn.textContent =
-                    "▶";
+                playBtn.textContent = "▶";
 
                 playBtn.classList.remove(
                     "playing"
@@ -650,22 +572,18 @@ document.addEventListener(
                     currentImageURL
                 );
 
-                currentImageURL =
-                    null;
+                currentImageURL = null;
 
             }
 
         }
 
 
-        /* =====================================================
+        /* =================================================
            DRAG & DROP
-        ===================================================== */
+        ================================================= */
 
         if (uploadBox) {
-
-
-            /* Drag over */
 
             uploadBox.addEventListener(
                 "dragover",
@@ -681,8 +599,6 @@ document.addEventListener(
             );
 
 
-            /* Drag leave */
-
             uploadBox.addEventListener(
                 "dragleave",
                 () => {
@@ -694,8 +610,6 @@ document.addEventListener(
                 }
             );
 
-
-            /* Drop */
 
             uploadBox.addEventListener(
                 "drop",
@@ -715,9 +629,7 @@ document.addEventListener(
 
                     if (
                         file &&
-                        file.type.startsWith(
-                            "image/"
-                        )
+                        file.type.startsWith("image/")
                     ) {
 
                         const dataTransfer =
@@ -745,9 +657,9 @@ document.addEventListener(
         }
 
 
-        /* =====================================================
-           ANALYZE IMAGE
-        ===================================================== */
+        /* =================================================
+           ANALYZE BUTTON
+        ================================================= */
 
         if (analyzeBtn) {
 
@@ -757,520 +669,501 @@ document.addEventListener(
             );
 
         }
-        /* =====================================================
-   REAL AI IMAGE ANALYSIS
-   OpenRouter → /api/analyze
-===================================================== */
 
-async function analyzeImage() {
 
-    /* -------------------------------------------------
-       CHECK IMAGE
-    ------------------------------------------------- */
+        /* =================================================
+           AI IMAGE ANALYSIS
+           OpenRouter → /api/analyze
+        ================================================= */
 
-    const file = imageInput?.files?.[0];
+        async function analyzeImage() {
 
-    if (!file) {
-        alert("Please upload an image first.");
-        return;
-    }
+            const file =
+                imageInput?.files?.[0];
 
-    if (!file.type.startsWith("image/")) {
-        alert("Please upload a valid image.");
-        return;
-    }
 
+            if (!file) {
 
-    /* -------------------------------------------------
-       CHECK ANALYSIS DATA
-    ------------------------------------------------- */
-
-    if (
-        !analysisData ||
-        !Array.isArray(analysisData.analyses) ||
-        !analysisData.analyses.length
-    ) {
-        alert(
-            "AuraTune analysis data is still loading. Please try again."
-        );
-
-        return;
-    }
-
-
-    /* -------------------------------------------------
-       LOADING STATE
-    ------------------------------------------------- */
-
-    analyzeBtn.disabled = true;
-
-    analyzeBtn.innerHTML = `
-        <span class="loading-spinner"></span>
-        Reading your aura...
-    `;
-
-
-    try {
-
-        /* -------------------------------------------------
-           CONVERT IMAGE TO BASE64
-        ------------------------------------------------- */
-
-        const imageBase64 =
-            await fileToBase64(file);
-
-
-        /* -------------------------------------------------
-           SEND IMAGE TO AURATUNE API
-        ------------------------------------------------- */
-
-        const response =
-            await fetch("/api/analyze", {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    image: imageBase64
-                })
-            });
-
-
-        /* -------------------------------------------------
-           READ API RESPONSE
-        ------------------------------------------------- */
-
-        const data =
-            await response.json();
-
-
-        /* -------------------------------------------------
-           HANDLE API ERROR
-        ------------------------------------------------- */
-
-        if (!response.ok) {
-
-            throw new Error(
-                data?.error ||
-                "AuraTune AI analysis failed."
-            );
-        }
-
-
-        /* -------------------------------------------------
-           GET AI ANALYSIS
-        ------------------------------------------------- */
-
-        const aiAnalysis =
-            data?.analysis;
-
-
-        if (!aiAnalysis) {
-
-            throw new Error(
-                "No AI analysis was returned."
-            );
-        }
-
-
-        console.log(
-            "AuraTune AI Analysis:",
-            aiAnalysis
-        );
-
-
-        /* -------------------------------------------------
-           MATCH AI RESULT WITH analysis.json
-        ------------------------------------------------- */
-
-        selectedAnalysis =
-            matchMusicToAI(
-                aiAnalysis
-            );
-
-
-        /* -------------------------------------------------
-           DISPLAY RESULT
-        ------------------------------------------------- */
-
-        displayAnalysis(
-            selectedAnalysis
-        );
-
-
-        /* -------------------------------------------------
-           SHOW RESULT
-        ------------------------------------------------- */
-
-        if (resultSection) {
-
-            resultSection.hidden =
-                false;
-        }
-
-
-        /* -------------------------------------------------
-           SCROLL TO RESULT
-        ------------------------------------------------- */
-
-        if (resultSection) {
-
-            resultSection.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        }
-
-    } catch (error) {
-
-        console.error(
-            "AuraTune AI Error:",
-            error
-        );
-
-        alert(
-            error.message ||
-            "Something went wrong while analyzing your image."
-        );
-
-    } finally {
-
-        /* -------------------------------------------------
-           RESET BUTTON
-        ------------------------------------------------- */
-
-        analyzeBtn.disabled =
-            false;
-
-        analyzeBtn.innerHTML = `
-            <span>✦</span>
-            Analyze My Image
-            <span>→</span>
-        `;
-    }
-}
-
-
-/* =====================================================
-   FILE → BASE64
-===================================================== */
-
-function fileToBase64(file) {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            const reader =
-                new FileReader();
-
-            reader.onload = () => {
-
-                resolve(
-                    reader.result
+                alert(
+                    "Please upload an image first."
                 );
-            };
-
-            reader.onerror = () => {
-
-                reject(
-                    new Error(
-                        "Could not read the image."
-                    )
-                );
-            };
-
-            reader.readAsDataURL(file);
-        }
-    );
-}
-
-
-/* =====================================================
-   MATCH AI RESULT WITH analysis.json
-===================================================== */
-
-function matchMusicToAI(aiAnalysis) {
-
-    const analyses =
-        analysisData.analyses;
-
-
-    /* -------------------------------------------------
-       SAFETY CHECK
-    ------------------------------------------------- */
-
-    if (!analyses.length) {
-
-        throw new Error(
-            "No music analysis data available."
-        );
-    }
-
-
-    /* -------------------------------------------------
-       NORMALIZE AI DATA
-    ------------------------------------------------- */
-
-    const aiScene =
-        String(
-            aiAnalysis.scene || ""
-        ).toLowerCase();
-
-    const aiStyle =
-        String(
-            aiAnalysis.style || ""
-        ).toLowerCase();
-
-    const aiMusicType =
-        String(
-            aiAnalysis.music_type || ""
-        ).toLowerCase();
-
-
-    const aiMoods =
-        Array.isArray(aiAnalysis.mood)
-            ? aiAnalysis.mood.map(
-                mood =>
-                    String(mood).toLowerCase()
-            )
-            : [];
-
-
-    /* -------------------------------------------------
-       SCORE EACH MUSIC PROFILE
-    ------------------------------------------------- */
-
-    let bestMatch =
-        analyses[0];
-
-    let highestScore =
-        -1;
-
-
-    analyses.forEach(
-        (analysis) => {
-
-            let score = 0;
-
-
-            /* -----------------------------------------
-               SCENE MATCH
-            ----------------------------------------- */
-
-            const scene =
-                String(
-                    analysis.scene || ""
-                ).toLowerCase();
-
-            if (
-                aiScene &&
-                (
-                    aiScene.includes(scene) ||
-                    scene.includes(aiScene)
-                )
-            ) {
-                score += 10;
-            }
-
-
-            /* -----------------------------------------
-               STYLE MATCH
-            ----------------------------------------- */
-
-            const style =
-                String(
-                    analysis.style || ""
-                ).toLowerCase();
-
-            if (
-                aiStyle &&
-                (
-                    aiStyle.includes(style) ||
-                    style.includes(aiStyle)
-                )
-            ) {
-                score += 8;
-            }
-
-
-            /* -----------------------------------------
-               MUSIC TYPE MATCH
-            ----------------------------------------- */
-
-            const musicType =
-                String(
-                    analysis.music_type || ""
-                ).toLowerCase();
-
-            if (
-                aiMusicType &&
-                (
-                    aiMusicType.includes(musicType) ||
-                    musicType.includes(aiMusicType)
-                )
-            ) {
-                score += 8;
-            }
-
-
-            /* -----------------------------------------
-               MOOD MATCH
-            ----------------------------------------- */
-
-            const analysisMoods =
-                Array.isArray(analysis.mood)
-                    ? analysis.mood.map(
-                        mood =>
-                            String(mood).toLowerCase()
-                    )
-                    : [];
-
-
-            aiMoods.forEach(
-                (aiMood) => {
-
-                    analysisMoods.forEach(
-                        (analysisMood) => {
-
-                            if (
-                                aiMood.includes(
-                                    analysisMood
-                                ) ||
-                                analysisMood.includes(
-                                    aiMood
-                                )
-                            ) {
-                                score += 5;
-                            }
-                        }
-                    );
-                }
-            );
-
-
-            /* -----------------------------------------
-               ENERGY MATCH
-            ----------------------------------------- */
-
-            if (
-                typeof aiAnalysis.energy ===
-                "number" &&
-                typeof analysis.energy ===
-                "number"
-            ) {
-
-                const difference =
-                    Math.abs(
-                        aiAnalysis.energy -
-                        analysis.energy
-                    );
-
-
-                if (difference <= 10) {
-
-                    score += 6;
-
-                } else if (difference <= 20) {
-
-                    score += 3;
-                }
-            }
-
-
-            /* -----------------------------------------
-               SAVE BEST MATCH
-            ----------------------------------------- */
-
-            if (
-                score >
-                highestScore
-            ) {
-
-                highestScore =
-                    score;
-
-                bestMatch =
-                    analysis;
-            }
-        }
-    );
-
-
-    /* -------------------------------------------------
-       COMBINE AI RESULT + MUSIC PROFILE
-    ------------------------------------------------- */
-
-    return {
-
-        ...bestMatch,
-
-        scene:
-            aiAnalysis.scene ||
-            bestMatch.scene,
-
-        description:
-            aiAnalysis.description ||
-            bestMatch.description,
-
-        mood:
-            Array.isArray(
-                aiAnalysis.mood
-            ) &&
-            aiAnalysis.mood.length
-                ? aiAnalysis.mood
-                : bestMatch.mood,
-
-        energy:
-            typeof aiAnalysis.energy ===
-            "number"
-                ? aiAnalysis.energy
-                : bestMatch.energy,
-
-        style:
-            aiAnalysis.style ||
-            bestMatch.style,
-
-        music_type:
-            aiAnalysis.music_type ||
-            bestMatch.music_type,
-
-        instruments:
-            Array.isArray(
-                aiAnalysis.instruments
-            ) &&
-            aiAnalysis.instruments.length
-                ? aiAnalysis.instruments
-                : bestMatch.instruments,
-
-        /* Music comes from your
-           analysis.json */
-
-        music:
-            bestMatch.music
-    };
-}
-
-         /* =====================================================
-           DISPLAY ANALYSIS
-        ===================================================== */
-
-        function displayAnalysis(
-            analysis
-        ) {
-
-            if (!analysis) {
 
                 return;
 
             }
 
 
-            /* -------------------------------------------------
-               RESULT IMAGE
-            ------------------------------------------------- */
+            if (!file.type.startsWith("image/")) {
+
+                alert(
+                    "Please upload a valid image."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                !analysisData ||
+                !Array.isArray(
+                    analysisData.analyses
+                ) ||
+                !analysisData.analyses.length
+            ) {
+
+                alert(
+                    "AuraTune analysis data is still loading. Please try again."
+                );
+
+                return;
+
+            }
+
+
+            analyzeBtn.disabled = true;
+
+
+            analyzeBtn.innerHTML = `
+                <span class="loading-spinner"></span>
+                Reading your aura...
+            `;
+
+
+            try {
+
+                const imageBase64 =
+                    await fileToBase64(file);
+
+
+                const response =
+                    await fetch(
+                        "/api/analyze",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                image: imageBase64
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data?.error ||
+                        "AuraTune AI analysis failed."
+                    );
+
+                }
+
+
+                const aiAnalysis =
+                    data?.analysis;
+
+
+                if (!aiAnalysis) {
+
+                    throw new Error(
+                        "No AI analysis was returned."
+                    );
+
+                }
+
+
+                console.log(
+                    "AuraTune AI Analysis:",
+                    aiAnalysis
+                );
+
+
+                selectedAnalysis =
+                    matchMusicToAI(
+                        aiAnalysis
+                    );
+
+
+                displayAnalysis(
+                    selectedAnalysis
+                );
+
+
+                if (resultSection) {
+
+                    resultSection.hidden = false;
+
+                }
+
+
+                resultSection?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+
+            } catch (error) {
+
+                console.error(
+                    "AuraTune AI Error:",
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    "Something went wrong while analyzing your image."
+                );
+
+            } finally {
+
+                analyzeBtn.disabled = false;
+
+
+                analyzeBtn.innerHTML = `
+                    <span>✦</span>
+                    Analyze My Image
+                    <span>→</span>
+                `;
+
+            }
+
+        }
+
+
+        /* =================================================
+           FILE → BASE64
+        ================================================= */
+
+        function fileToBase64(file) {
+
+            return new Promise(
+                (resolve, reject) => {
+
+                    const reader =
+                        new FileReader();
+
+
+                    reader.onload = () => {
+
+                        resolve(
+                            reader.result
+                        );
+
+                    };
+
+
+                    reader.onerror = () => {
+
+                        reject(
+                            new Error(
+                                "Could not read the image."
+                            )
+                        );
+
+                    };
+
+
+                    reader.readAsDataURL(file);
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           MATCH AI RESULT WITH analysis.json
+        ================================================= */
+
+        function matchMusicToAI(aiAnalysis) {
+
+            const analyses =
+                analysisData.analyses;
+
+
+            if (!analyses.length) {
+
+                throw new Error(
+                    "No music analysis data available."
+                );
+
+            }
+
+
+            const aiScene =
+                String(
+                    aiAnalysis.scene || ""
+                ).toLowerCase();
+
+
+            const aiStyle =
+                String(
+                    aiAnalysis.style || ""
+                ).toLowerCase();
+
+
+            const aiMusicType =
+                String(
+                    aiAnalysis.music_type || ""
+                ).toLowerCase();
+
+
+            const aiMoods =
+                Array.isArray(
+                    aiAnalysis.mood
+                )
+                    ? aiAnalysis.mood.map(
+                        mood =>
+                            String(
+                                mood
+                            ).toLowerCase()
+                    )
+                    : [];
+
+
+            let bestMatch =
+                analyses[0];
+
+
+            let highestScore =
+                -1;
+
+
+            analyses.forEach(
+                (analysis) => {
+
+                    let score = 0;
+
+
+                    /* SCENE */
+
+                    const scene =
+                        String(
+                            analysis.scene || ""
+                        ).toLowerCase();
+
+
+                    if (
+                        aiScene &&
+                        (
+                            aiScene.includes(scene) ||
+                            scene.includes(aiScene)
+                        )
+                    ) {
+
+                        score += 10;
+
+                    }
+
+
+                    /* STYLE */
+
+                    const style =
+                        String(
+                            analysis.style || ""
+                        ).toLowerCase();
+
+
+                    if (
+                        aiStyle &&
+                        (
+                            aiStyle.includes(style) ||
+                            style.includes(aiStyle)
+                        )
+                    ) {
+
+                        score += 8;
+
+                    }
+
+
+                    /* MUSIC TYPE */
+
+                    const musicType =
+                        String(
+                            analysis.music_type || ""
+                        ).toLowerCase();
+
+
+                    if (
+                        aiMusicType &&
+                        (
+                            aiMusicType.includes(musicType) ||
+                            musicType.includes(aiMusicType)
+                        )
+                    ) {
+
+                        score += 8;
+
+                    }
+
+
+                    /* MOOD */
+
+                    const analysisMoods =
+                        Array.isArray(
+                            analysis.mood
+                        )
+                            ? analysis.mood.map(
+                                mood =>
+                                    String(
+                                        mood
+                                    ).toLowerCase()
+                            )
+                            : [];
+
+
+                    aiMoods.forEach(
+                        (aiMood) => {
+
+                            analysisMoods.forEach(
+                                (analysisMood) => {
+
+                                    if (
+                                        aiMood.includes(
+                                            analysisMood
+                                        ) ||
+                                        analysisMood.includes(
+                                            aiMood
+                                        )
+                                    ) {
+
+                                        score += 5;
+
+                                    }
+
+                                }
+                            );
+
+                        }
+                    );
+
+
+                    /* ENERGY */
+
+                    if (
+                        typeof aiAnalysis.energy ===
+                        "number" &&
+                        typeof analysis.energy ===
+                        "number"
+                    ) {
+
+                        const difference =
+                            Math.abs(
+                                aiAnalysis.energy -
+                                analysis.energy
+                            );
+
+
+                        if (difference <= 10) {
+
+                            score += 6;
+
+                        } else if (
+                            difference <= 20
+                        ) {
+
+                            score += 3;
+
+                        }
+
+                    }
+
+
+                    if (
+                        score >
+                        highestScore
+                    ) {
+
+                        highestScore =
+                            score;
+
+                        bestMatch =
+                            analysis;
+
+                    }
+
+                }
+            );
+
+
+            return {
+
+                ...bestMatch,
+
+                scene:
+                    aiAnalysis.scene ||
+                    bestMatch.scene,
+
+                description:
+                    aiAnalysis.description ||
+                    bestMatch.description,
+
+                mood:
+                    Array.isArray(
+                        aiAnalysis.mood
+                    ) &&
+                    aiAnalysis.mood.length
+                        ? aiAnalysis.mood
+                        : bestMatch.mood,
+
+                energy:
+                    typeof aiAnalysis.energy ===
+                    "number"
+                        ? aiAnalysis.energy
+                        : bestMatch.energy,
+
+                style:
+                    aiAnalysis.style ||
+                    bestMatch.style,
+
+                music_type:
+                    aiAnalysis.music_type ||
+                    bestMatch.music_type,
+
+                instruments:
+                    Array.isArray(
+                        aiAnalysis.instruments
+                    ) &&
+                    aiAnalysis.instruments.length
+                        ? aiAnalysis.instruments
+                        : bestMatch.instruments,
+
+                /*
+                 * IMPORTANT:
+                 * Keep the music object from
+                 * analysis.json.
+                 */
+                music:
+                    bestMatch.music
+
+            };
+
+        }
+
+
+        /* =================================================
+           DISPLAY ANALYSIS
+        ================================================= */
+
+        function displayAnalysis(
+            analysis
+        ) {
+
+            if (!analysis) {
+                return;
+            }
+
 
             if (resultImage) {
 
@@ -1280,10 +1173,6 @@ function matchMusicToAI(aiAnalysis) {
             }
 
 
-            /* -------------------------------------------------
-               SCENE
-            ------------------------------------------------- */
-
             if (sceneText) {
 
                 sceneText.textContent =
@@ -1292,27 +1181,15 @@ function matchMusicToAI(aiAnalysis) {
             }
 
 
-            /* -------------------------------------------------
-               MOOD TAGS
-            ------------------------------------------------- */
-
             createMoodTags(
                 analysis.mood
             );
 
 
-            /* -------------------------------------------------
-               MUSIC INFORMATION
-            ------------------------------------------------- */
-
             updateMusicPlayer(
                 analysis
             );
 
-
-            /* -------------------------------------------------
-               ANALYSIS DETAILS
-            ------------------------------------------------- */
 
             updateAnalysisDetails(
                 analysis
@@ -1320,16 +1197,16 @@ function matchMusicToAI(aiAnalysis) {
 
 
             console.log(
-                "AuraTune Analysis:",
+                "AuraTune Final Analysis:",
                 analysis
             );
 
         }
 
 
-        /* =====================================================
+        /* =================================================
            CREATE MOOD TAGS
-        ===================================================== */
+        ================================================= */
 
         function createMoodTags(
             moods
@@ -1342,9 +1219,7 @@ function matchMusicToAI(aiAnalysis) {
 
 
             if (!moodContainer) {
-
                 return;
-
             }
 
 
@@ -1352,12 +1227,8 @@ function matchMusicToAI(aiAnalysis) {
                 "";
 
 
-            if (
-                !Array.isArray(moods)
-            ) {
-
+            if (!Array.isArray(moods)) {
                 return;
-
             }
 
 
@@ -1384,9 +1255,9 @@ function matchMusicToAI(aiAnalysis) {
         }
 
 
-        /* =====================================================
+        /* =================================================
            UPDATE MUSIC PLAYER
-        ===================================================== */
+        ================================================= */
 
         function updateMusicPlayer(
             analysis
@@ -1423,7 +1294,8 @@ function matchMusicToAI(aiAnalysis) {
             if (musicTitle) {
 
                 musicTitle.textContent =
-                    analysis.music.title;
+                    analysis.music.title ||
+                    "AuraTune";
 
             }
 
@@ -1431,7 +1303,13 @@ function matchMusicToAI(aiAnalysis) {
             if (musicType) {
 
                 musicType.textContent =
-                    `${analysis.music.genre} · ${analysis.music.duration}`;
+                    `${
+                        analysis.music.genre ||
+                        "Ambient"
+                    } · ${
+                        analysis.music.duration ||
+                        "AuraTune"
+                    }`;
 
             }
 
@@ -1439,25 +1317,21 @@ function matchMusicToAI(aiAnalysis) {
             if (musicArtist) {
 
                 musicArtist.textContent =
-                    analysis.music.artist;
+                    analysis.music.artist ||
+                    "Mixkit";
 
             }
 
         }
 
 
-        /* =====================================================
+        /* =================================================
            UPDATE EXTRA ANALYSIS DETAILS
-        ===================================================== */
+        ================================================= */
 
         function updateAnalysisDetails(
             analysis
         ) {
-
-
-            /* -------------------------------------------------
-               Description
-            ------------------------------------------------- */
 
             const description =
                 document.querySelector(
@@ -1476,10 +1350,6 @@ function matchMusicToAI(aiAnalysis) {
             }
 
 
-            /* -------------------------------------------------
-               Style
-            ------------------------------------------------- */
-
             const style =
                 document.querySelector(
                     ".analysis-style"
@@ -1496,10 +1366,6 @@ function matchMusicToAI(aiAnalysis) {
 
             }
 
-
-            /* -------------------------------------------------
-               Music Type
-            ------------------------------------------------- */
 
             const musicType =
                 document.querySelector(
@@ -1518,10 +1384,6 @@ function matchMusicToAI(aiAnalysis) {
             }
 
 
-            /* -------------------------------------------------
-               Energy
-            ------------------------------------------------- */
-
             const energy =
                 document.querySelector(
                     ".analysis-energy"
@@ -1531,7 +1393,7 @@ function matchMusicToAI(aiAnalysis) {
             if (
                 energy &&
                 typeof analysis.energy ===
-                    "number"
+                "number"
             ) {
 
                 energy.textContent =
@@ -1539,10 +1401,6 @@ function matchMusicToAI(aiAnalysis) {
 
             }
 
-
-            /* -------------------------------------------------
-               Instruments
-            ------------------------------------------------- */
 
             const instruments =
                 document.querySelector(
@@ -1567,22 +1425,26 @@ function matchMusicToAI(aiAnalysis) {
         }
 
 
-        /* =====================================================
-           PLAY BUTTON
-        ===================================================== */
+        /* =================================================
+           REAL MUSIC PLAYER
+           
+           Reads the exact file path from analysis.json.
+           
+           Example:
+           assets/music/mixkit-relax-658.mp3
+        ================================================= */
 
         if (playBtn) {
 
             playBtn.addEventListener(
                 "click",
-                () => {
+                async () => {
 
+                    /* -------------------------------------
+                       CHECK ANALYSIS
+                    ------------------------------------- */
 
-                    /* Check analysis */
-
-                    if (
-                        !selectedAnalysis
-                    ) {
+                    if (!selectedAnalysis) {
 
                         alert(
                             "Analyze an image first."
@@ -1593,32 +1455,199 @@ function matchMusicToAI(aiAnalysis) {
                     }
 
 
-                    playing =
-                        !playing;
+                    /* -------------------------------------
+                       GET MUSIC FILE
+                    ------------------------------------- */
+
+                    const musicFile =
+                        selectedAnalysis
+                            ?.music
+                            ?.file;
 
 
-                    if (playing) {
+                    if (!musicFile) {
 
-                        playBtn.textContent =
-                            "❚❚";
-
-
-                        playBtn.classList.add(
-                            "playing"
+                        alert(
+                            "No music file was found for this image."
                         );
 
-
-                        console.log(
-                            "AuraTune selected:",
-                            selectedAnalysis.music
+                        console.error(
+                            "Missing music file:",
+                            selectedAnalysis
                         );
 
+                        return;
+
+                    }
+
+
+                    /*
+                     * IMPORTANT
+                     *
+                     * Convert:
+                     *
+                     * assets/music/file.mp3
+                     *
+                     * into the correct URL for
+                     * GitHub Pages / Vercel.
+                     */
+
+                    const musicURL =
+                        new URL(
+                            musicFile,
+                            window.location.href
+                        ).href;
+
+
+                    console.log(
+                        "🎵 AuraTune music:",
+                        musicURL
+                    );
+
+
+                    /* -------------------------------------
+                       CREATE AUDIO PLAYER
+                    ------------------------------------- */
+
+                    if (!audioPlayer) {
+
+                        audioPlayer =
+                            new Audio();
+
+                        audioPlayer.preload =
+                            "auto";
+
+                    }
+
+
+                    /* -------------------------------------
+                       CHANGE SONG IF NEEDED
+                    ------------------------------------- */
+
+                    if (
+                        audioPlayer.src !==
+                        musicURL
+                    ) {
+
+                        audioPlayer.pause();
+
+                        audioPlayer.currentTime =
+                            0;
+
+                        audioPlayer.src =
+                            musicURL;
+
+                    }
+
+
+                    /* -------------------------------------
+                       MUSIC ENDED
+                    ------------------------------------- */
+
+                    audioPlayer.onended =
+                        () => {
+
+                            playing = false;
+
+                            playBtn.textContent =
+                                "▶";
+
+                            playBtn.classList.remove(
+                                "playing"
+                            );
+
+                        };
+
+
+                    /* -------------------------------------
+                       AUDIO ERROR
+                    ------------------------------------- */
+
+                    audioPlayer.onerror =
+                        () => {
+
+                            playing = false;
+
+                            playBtn.textContent =
+                                "▶";
+
+                            playBtn.classList.remove(
+                                "playing"
+                            );
+
+
+                            console.error(
+                                "Could not load music file:",
+                                musicURL
+                            );
+
+
+                            alert(
+                                "AuraTune could not load this music file. Check the MP3 filename and assets/music folder."
+                            );
+
+                        };
+
+
+                    /* -------------------------------------
+                       PLAY / PAUSE
+                    ------------------------------------- */
+
+                    if (
+                        audioPlayer.paused
+                    ) {
+
+                        try {
+
+                            await audioPlayer.play();
+
+                            playing = true;
+
+                            playBtn.textContent =
+                                "❚❚";
+
+                            playBtn.classList.add(
+                                "playing"
+                            );
+
+
+                            console.log(
+                                "🎵 Playing:",
+                                musicFile
+                            );
+
+                        } catch (error) {
+
+                            console.error(
+                                "Audio playback error:",
+                                error
+                            );
+
+
+                            playing = false;
+
+                            playBtn.textContent =
+                                "▶";
+
+                            playBtn.classList.remove(
+                                "playing"
+                            );
+
+
+                            alert(
+                                "The music could not be played. Please check the MP3 file."
+                            );
+
+                        }
 
                     } else {
 
+                        audioPlayer.pause();
+
+                        playing = false;
+
                         playBtn.textContent =
                             "▶";
-
 
                         playBtn.classList.remove(
                             "playing"
@@ -1632,9 +1661,50 @@ function matchMusicToAI(aiAnalysis) {
         }
 
 
-        /* =====================================================
+        /* =================================================
+           STOP MUSIC
+        ================================================= */
+
+        function stopMusic() {
+
+            if (audioPlayer) {
+
+                audioPlayer.pause();
+
+                audioPlayer.currentTime =
+                    0;
+
+                audioPlayer.removeAttribute(
+                    "src"
+                );
+
+                audioPlayer.load();
+
+                audioPlayer = null;
+
+            }
+
+
+            playing = false;
+
+
+            if (playBtn) {
+
+                playBtn.textContent =
+                    "▶";
+
+                playBtn.classList.remove(
+                    "playing"
+                );
+
+            }
+
+        }
+
+
+        /* =================================================
            SCROLL REVEAL
-        ===================================================== */
+        ================================================= */
 
         const revealElements =
             document.querySelectorAll(
@@ -1697,9 +1767,9 @@ function matchMusicToAI(aiAnalysis) {
         }
 
 
-        /* =====================================================
+        /* =================================================
            HELPER — WAIT
-        ===================================================== */
+        ================================================= */
 
         function wait(
             milliseconds
