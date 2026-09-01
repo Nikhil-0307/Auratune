@@ -757,166 +757,503 @@ document.addEventListener(
             );
 
         }
+        /* =====================================================
+   REAL AI IMAGE ANALYSIS
+   OpenRouter → /api/analyze
+===================================================== */
+
+async function analyzeImage() {
+
+    /* -------------------------------------------------
+       CHECK IMAGE
+    ------------------------------------------------- */
+
+    const file = imageInput?.files?.[0];
+
+    if (!file) {
+        alert("Please upload an image first.");
+        return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+        alert("Please upload a valid image.");
+        return;
+    }
 
 
-        async function analyzeImage() {
+    /* -------------------------------------------------
+       CHECK ANALYSIS DATA
+    ------------------------------------------------- */
+
+    if (
+        !analysisData ||
+        !Array.isArray(analysisData.analyses) ||
+        !analysisData.analyses.length
+    ) {
+        alert(
+            "AuraTune analysis data is still loading. Please try again."
+        );
+
+        return;
+    }
 
 
-            /* -------------------------------------------------
-               CHECK IMAGE
-            ------------------------------------------------- */
+    /* -------------------------------------------------
+       LOADING STATE
+    ------------------------------------------------- */
 
-            if (
-                !imagePreview ||
-                !imagePreview.src ||
-                imagePreview.src ===
-                    window.location.href
-            ) {
+    analyzeBtn.disabled = true;
 
-                alert(
-                    "Please upload an image first."
-                );
-
-                return;
-
-            }
+    analyzeBtn.innerHTML = `
+        <span class="loading-spinner"></span>
+        Reading your aura...
+    `;
 
 
-            /* -------------------------------------------------
-               CHECK JSON
-            ------------------------------------------------- */
+    try {
 
-            if (
-                !analysisData ||
-                !analysisData.analyses ||
-                !analysisData.analyses.length
-            ) {
+        /* -------------------------------------------------
+           CONVERT IMAGE TO BASE64
+        ------------------------------------------------- */
 
-                alert(
-                    "AuraTune analysis data is still loading. Please try again."
-                );
-
-                return;
-
-            }
+        const imageBase64 =
+            await fileToBase64(file);
 
 
-            /* -------------------------------------------------
-               LOADING
-            ------------------------------------------------- */
+        /* -------------------------------------------------
+           SEND IMAGE TO AURATUNE API
+        ------------------------------------------------- */
 
-            analyzeBtn.disabled =
-                true;
+        const response =
+            await fetch("/api/analyze", {
 
+                method: "POST",
 
-            analyzeBtn.innerHTML = `
-                <span class="loading-spinner"></span>
-                Reading your aura...
-            `;
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-
-            /* -------------------------------------------------
-               SIMULATE ANALYSIS
-            ------------------------------------------------- */
-
-            await wait(1800);
+                body: JSON.stringify({
+                    image: imageBase64
+                })
+            });
 
 
-            /*
-             * For this current version,
-             * AuraTune selects one analysis
-             * from analysis.json.
-             *
-             * Later this will be replaced
-             * with real AI image analysis.
-             */
+        /* -------------------------------------------------
+           READ API RESPONSE
+        ------------------------------------------------- */
 
-            selectedAnalysis =
-                selectAnalysis();
+        const data =
+            await response.json();
 
 
-            /* -------------------------------------------------
-               DISPLAY RESULT
-            ------------------------------------------------- */
+        /* -------------------------------------------------
+           HANDLE API ERROR
+        ------------------------------------------------- */
 
-            displayAnalysis(
-                selectedAnalysis
+        if (!response.ok) {
+
+            throw new Error(
+                data?.error ||
+                "AuraTune AI analysis failed."
+            );
+        }
+
+
+        /* -------------------------------------------------
+           GET AI ANALYSIS
+        ------------------------------------------------- */
+
+        const aiAnalysis =
+            data?.analysis;
+
+
+        if (!aiAnalysis) {
+
+            throw new Error(
+                "No AI analysis was returned."
+            );
+        }
+
+
+        console.log(
+            "AuraTune AI Analysis:",
+            aiAnalysis
+        );
+
+
+        /* -------------------------------------------------
+           MATCH AI RESULT WITH analysis.json
+        ------------------------------------------------- */
+
+        selectedAnalysis =
+            matchMusicToAI(
+                aiAnalysis
             );
 
 
-            /* -------------------------------------------------
-               SHOW RESULT
-            ------------------------------------------------- */
+        /* -------------------------------------------------
+           DISPLAY RESULT
+        ------------------------------------------------- */
 
-            if (resultSection) {
-
-                resultSection.hidden =
-                    false;
-
-            }
+        displayAnalysis(
+            selectedAnalysis
+        );
 
 
-            /* -------------------------------------------------
-               RESET BUTTON
-            ------------------------------------------------- */
+        /* -------------------------------------------------
+           SHOW RESULT
+        ------------------------------------------------- */
 
-            analyzeBtn.disabled =
+        if (resultSection) {
+
+            resultSection.hidden =
                 false;
+        }
 
 
-            analyzeBtn.innerHTML = `
-                <span>✦</span>
-                Analyze My Image
-                <span>→</span>
-            `;
+        /* -------------------------------------------------
+           SCROLL TO RESULT
+        ------------------------------------------------- */
+
+        if (resultSection) {
+
+            resultSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+
+    } catch (error) {
+
+        console.error(
+            "AuraTune AI Error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Something went wrong while analyzing your image."
+        );
+
+    } finally {
+
+        /* -------------------------------------------------
+           RESET BUTTON
+        ------------------------------------------------- */
+
+        analyzeBtn.disabled =
+            false;
+
+        analyzeBtn.innerHTML = `
+            <span>✦</span>
+            Analyze My Image
+            <span>→</span>
+        `;
+    }
+}
 
 
-            /* -------------------------------------------------
-               SCROLL TO RESULT
-            ------------------------------------------------- */
+/* =====================================================
+   FILE → BASE64
+===================================================== */
 
-            if (resultSection) {
+function fileToBase64(file) {
 
-                resultSection.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
+    return new Promise(
+        (resolve, reject) => {
 
+            const reader =
+                new FileReader();
+
+            reader.onload = () => {
+
+                resolve(
+                    reader.result
+                );
+            };
+
+            reader.onerror = () => {
+
+                reject(
+                    new Error(
+                        "Could not read the image."
+                    )
+                );
+            };
+
+            reader.readAsDataURL(file);
+        }
+    );
+}
+
+
+/* =====================================================
+   MATCH AI RESULT WITH analysis.json
+===================================================== */
+
+function matchMusicToAI(aiAnalysis) {
+
+    const analyses =
+        analysisData.analyses;
+
+
+    /* -------------------------------------------------
+       SAFETY CHECK
+    ------------------------------------------------- */
+
+    if (!analyses.length) {
+
+        throw new Error(
+            "No music analysis data available."
+        );
+    }
+
+
+    /* -------------------------------------------------
+       NORMALIZE AI DATA
+    ------------------------------------------------- */
+
+    const aiScene =
+        String(
+            aiAnalysis.scene || ""
+        ).toLowerCase();
+
+    const aiStyle =
+        String(
+            aiAnalysis.style || ""
+        ).toLowerCase();
+
+    const aiMusicType =
+        String(
+            aiAnalysis.music_type || ""
+        ).toLowerCase();
+
+
+    const aiMoods =
+        Array.isArray(aiAnalysis.mood)
+            ? aiAnalysis.mood.map(
+                mood =>
+                    String(mood).toLowerCase()
+            )
+            : [];
+
+
+    /* -------------------------------------------------
+       SCORE EACH MUSIC PROFILE
+    ------------------------------------------------- */
+
+    let bestMatch =
+        analyses[0];
+
+    let highestScore =
+        -1;
+
+
+    analyses.forEach(
+        (analysis) => {
+
+            let score = 0;
+
+
+            /* -----------------------------------------
+               SCENE MATCH
+            ----------------------------------------- */
+
+            const scene =
+                String(
+                    analysis.scene || ""
+                ).toLowerCase();
+
+            if (
+                aiScene &&
+                (
+                    aiScene.includes(scene) ||
+                    scene.includes(aiScene)
+                )
+            ) {
+                score += 10;
             }
 
+
+            /* -----------------------------------------
+               STYLE MATCH
+            ----------------------------------------- */
+
+            const style =
+                String(
+                    analysis.style || ""
+                ).toLowerCase();
+
+            if (
+                aiStyle &&
+                (
+                    aiStyle.includes(style) ||
+                    style.includes(aiStyle)
+                )
+            ) {
+                score += 8;
+            }
+
+
+            /* -----------------------------------------
+               MUSIC TYPE MATCH
+            ----------------------------------------- */
+
+            const musicType =
+                String(
+                    analysis.music_type || ""
+                ).toLowerCase();
+
+            if (
+                aiMusicType &&
+                (
+                    aiMusicType.includes(musicType) ||
+                    musicType.includes(aiMusicType)
+                )
+            ) {
+                score += 8;
+            }
+
+
+            /* -----------------------------------------
+               MOOD MATCH
+            ----------------------------------------- */
+
+            const analysisMoods =
+                Array.isArray(analysis.mood)
+                    ? analysis.mood.map(
+                        mood =>
+                            String(mood).toLowerCase()
+                    )
+                    : [];
+
+
+            aiMoods.forEach(
+                (aiMood) => {
+
+                    analysisMoods.forEach(
+                        (analysisMood) => {
+
+                            if (
+                                aiMood.includes(
+                                    analysisMood
+                                ) ||
+                                analysisMood.includes(
+                                    aiMood
+                                )
+                            ) {
+                                score += 5;
+                            }
+                        }
+                    );
+                }
+            );
+
+
+            /* -----------------------------------------
+               ENERGY MATCH
+            ----------------------------------------- */
+
+            if (
+                typeof aiAnalysis.energy ===
+                "number" &&
+                typeof analysis.energy ===
+                "number"
+            ) {
+
+                const difference =
+                    Math.abs(
+                        aiAnalysis.energy -
+                        analysis.energy
+                    );
+
+
+                if (difference <= 10) {
+
+                    score += 6;
+
+                } else if (difference <= 20) {
+
+                    score += 3;
+                }
+            }
+
+
+            /* -----------------------------------------
+               SAVE BEST MATCH
+            ----------------------------------------- */
+
+            if (
+                score >
+                highestScore
+            ) {
+
+                highestScore =
+                    score;
+
+                bestMatch =
+                    analysis;
+            }
         }
+    );
 
 
-        /* =====================================================
-           SELECT ANALYSIS
-        ===================================================== */
+    /* -------------------------------------------------
+       COMBINE AI RESULT + MUSIC PROFILE
+    ------------------------------------------------- */
 
-        function selectAnalysis() {
+    return {
 
-            const analyses =
-                analysisData.analyses;
+        ...bestMatch,
 
+        scene:
+            aiAnalysis.scene ||
+            bestMatch.scene,
 
-            /*
-             * Current demo:
-             * randomly selects one result.
-             */
+        description:
+            aiAnalysis.description ||
+            bestMatch.description,
 
-            const randomIndex =
-                Math.floor(
-                    Math.random() *
-                    analyses.length
-                );
+        mood:
+            Array.isArray(
+                aiAnalysis.mood
+            ) &&
+            aiAnalysis.mood.length
+                ? aiAnalysis.mood
+                : bestMatch.mood,
 
+        energy:
+            typeof aiAnalysis.energy ===
+            "number"
+                ? aiAnalysis.energy
+                : bestMatch.energy,
 
-            return analyses[
-                randomIndex
-            ];
+        style:
+            aiAnalysis.style ||
+            bestMatch.style,
 
-        }
+        music_type:
+            aiAnalysis.music_type ||
+            bestMatch.music_type,
 
+        instruments:
+            Array.isArray(
+                aiAnalysis.instruments
+            ) &&
+            aiAnalysis.instruments.length
+                ? aiAnalysis.instruments
+                : bestMatch.instruments,
 
-        /* =====================================================
+        /* Music comes from your
+           analysis.json */
+
+        music:
+            bestMatch.music
+    };
+}
+
+         /* =====================================================
            DISPLAY ANALYSIS
         ===================================================== */
 
