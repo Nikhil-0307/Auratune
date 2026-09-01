@@ -1,129 +1,411 @@
 {
-    "analyses": [
-        {
-            "id": "sunset",
-            "scene": "Sunset Beach",
-            "description": "A warm sunset over a peaceful coastal environment.",
-            "mood": [
-                "Calm",
-                "Peaceful",
-                "Dreamy",
-                "Warm"
-            ],
-            "energy": 25,
-            "style": "Cinematic",
-            "music_type": "Ambient",
-            "instruments": [
-                "Soft Piano",
-                "Warm Pads",
-                "Ocean Ambience"
-            ],
-            "music": {
-                "title": "Sunset Dreams",
-                "artist": "AuraTune",
-                "genre": "Ambient Cinematic",
-                "duration": "03:42"
-            }
-        },
-        {
-            "id": "mountain",
-            "scene": "Mountain Landscape",
-            "description": "A vast mountain environment with a powerful natural atmosphere.",
-            "mood": [
-                "Adventurous",
-                "Epic",
-                "Peaceful",
-                "Inspirational"
-            ],
-            "energy": 68,
-            "style": "Cinematic",
-            "music_type": "Epic Ambient",
-            "instruments": [
-                "Piano",
-                "Strings",
-                "Cinematic Drums"
-            ],
-            "music": {
-                "title": "Beyond The Peaks",
-                "artist": "AuraTune",
-                "genre": "Epic Cinematic",
-                "duration": "04:12"
-            }
-        },
-        {
-            "id": "city",
-            "scene": "Night City",
-            "description": "A futuristic urban environment filled with lights and energy.",
-            "mood": [
-                "Energetic",
-                "Futuristic",
-                "Mysterious",
-                "Urban"
-            ],
-            "energy": 82,
-            "style": "Electronic",
-            "music_type": "Synthwave",
-            "instruments": [
-                "Synthesizer",
-                "Electronic Bass",
-                "Digital Drums"
-            ],
-            "music": {
-                "title": "Neon Nights",
-                "artist": "AuraTune",
-                "genre": "Synthwave",
-                "duration": "03:56"
-            }
-        },
-        {
-            "id": "rain",
-            "scene": "Rainy Environment",
-            "description": "A quiet rainy environment with a reflective and atmospheric feeling.",
-            "mood": [
-                "Melancholic",
-                "Peaceful",
-                "Reflective",
-                "Atmospheric"
-            ],
-            "energy": 30,
-            "style": "Atmospheric",
-            "music_type": "Lo-Fi Ambient",
-            "instruments": [
-                "Soft Piano",
-                "Rain",
-                "Warm Synth"
-            ],
-            "music": {
-                "title": "Rain Memories",
-                "artist": "AuraTune",
-                "genre": "Lo-Fi Ambient",
-                "duration": "03:28"
-            }
-        },
-        {
-            "id": "forest",
-            "scene": "Forest",
-            "description": "A natural green environment surrounded by trees and peaceful atmosphere.",
-            "mood": [
-                "Natural",
-                "Peaceful",
-                "Refreshing",
-                "Relaxing"
-            ],
-            "energy": 35,
-            "style": "Nature",
-            "music_type": "Organic Ambient",
-            "instruments": [
-                "Acoustic Guitar",
-                "Flute",
-                "Nature Sounds"
-            ],
-            "music": {
-                "title": "Forest Whisper",
-                "artist": "AuraTune",
-                "genre": "Nature Ambient",
-                "duration": "04:05"
-            }
-        }
-    ]
+  "version": "2.0",
+  "app": "AuraTune",
+  "analyses": [
+    {
+      "id": "curiosity",
+      "scene": "Curious Discovery",
+      "description": "A sense of exploration, discovery and something new waiting to be found.",
+      "emotion": "Curious",
+      "mood": [
+        "Curious",
+        "Mysterious",
+        "Adventurous"
+      ],
+      "energy": 55,
+      "atmosphere": "Explorative",
+      "style": "Cinematic",
+      "music_type": "Discovery Ambient",
+      "instruments": [
+        "Piano",
+        "Ambient Synth",
+        "Percussion"
+      ],
+      "music": {
+        "title": "Curiosity",
+        "artist": "Mixkit",
+        "genre": "Cinematic Ambient",
+        "duration": "",
+        "file": "assets/music/mixkit-curiosity-480.mp3"
+      }
+    },
+    {
+      "id": "happy-home",
+      "scene": "Warm Happy Environment",
+      "description": "A cheerful and welcoming atmosphere that feels comfortable, positive and familiar.",
+      "emotion": "Joyful",
+      "mood": [
+        "Happy",
+        "Warm",
+        "Positive"
+      ],
+      "energy": 60,
+      "atmosphere": "Cheerful",
+      "style": "Acoustic",
+      "music_type": "Feel Good",
+      "instruments": [
+        "Acoustic Guitar",
+        "Piano",
+        "Light Percussion"
+      ],
+      "music": {
+        "title": "Happy Home",
+        "artist": "Mixkit",
+        "genre": "Acoustic / Feel Good",
+        "duration": "",
+        "file": "assets/music/mixkit-happy-home-801.mp3"
+      }
+    },
+    {
+      "id": "relax",
+      "scene": "Relaxing Environment",
+      "description": "A soft and peaceful atmosphere designed to create a feeling of relaxation and comfort.",
+      "emotion": "Relaxed",
+      "mood": [
+        "Calm",
+        "Relaxed",
+        "Peaceful"
+      ],
+      "energy": 20,
+      "atmosphere": "Soothing",
+      "style": "Ambient",
+      "music_type": "Relaxation",
+      "instruments": [
+        "Soft Piano",
+        "Warm Pads",
+        "Ambient Sounds"
+      ],
+      "music": {
+        "title": "Relax",
+        "artist": "Mixkit",
+        "genre": "Ambient",
+        "duration": "",
+        "file": "assets/music/mixkit-relax-658.mp3"
+      }
+    },
+    {
+      "id": "waka-floka",
+      "scene": "Party and Celebration",
+      "description": "A lively social environment filled with movement, excitement and celebration.",
+      "emotion": "Excited",
+      "mood": [
+        "Excited",
+        "Energetic",
+        "Playful"
+      ],
+      "energy": 90,
+      "atmosphere": "Party",
+      "style": "Electronic",
+      "music_type": "Dance",
+      "instruments": [
+        "Electronic Drums",
+        "Bass",
+        "Synthesizer"
+      ],
+      "music": {
+        "title": "Waka Floka Type",
+        "artist": "Mixkit",
+        "genre": "Electronic / Dance",
+        "duration": "",
+        "file": "assets/music/mixkit-waka-floka-type-364.mp3"
+      }
+    },
+    {
+      "id": "hanging",
+      "scene": "Emotional Atmospheric Scene",
+      "description": "A deeper atmospheric environment with an emotional and slightly melancholic character.",
+      "emotion": "Melancholic",
+      "mood": [
+        "Melancholic",
+        "Reflective",
+        "Atmospheric"
+      ],
+      "energy": 35,
+      "atmosphere": "Emotional",
+      "style": "Atmospheric",
+      "music_type": "Emotional Ambient",
+      "instruments": [
+        "Piano",
+        "Ambient Pads",
+        "Soft Strings"
+      ],
+      "music": {
+        "title": "Hanging",
+        "artist": "Mixkit",
+        "genre": "Atmospheric",
+        "duration": "",
+        "file": "assets/music/mixkit-nield-grohm-hanging-1-538.mp3"
+      }
+    },
+    {
+      "id": "sicilian-coffee",
+      "scene": "Cozy Cafe",
+      "description": "A warm, relaxed social environment with a comfortable cafe-like atmosphere.",
+      "emotion": "Warm",
+      "mood": [
+        "Warm",
+        "Relaxed",
+        "Joyful"
+      ],
+      "energy": 45,
+      "atmosphere": "Cozy",
+      "style": "Acoustic",
+      "music_type": "Cafe",
+      "instruments": [
+        "Guitar",
+        "Piano",
+        "Light Percussion"
+      ],
+      "music": {
+        "title": "Sicilian Coffee",
+        "artist": "Mixkit",
+        "genre": "Acoustic / Cafe",
+        "duration": "",
+        "file": "assets/music/mixkit-sicilian-coffee-613.mp3"
+      }
+    },
+    {
+      "id": "epical-drums",
+      "scene": "Epic Action Scene",
+      "description": "A dramatic environment filled with intensity, movement and a powerful sense of scale.",
+      "emotion": "Powerful",
+      "mood": [
+        "Epic",
+        "Powerful",
+        "Adventurous"
+      ],
+      "energy": 95,
+      "atmosphere": "Dramatic",
+      "style": "Cinematic",
+      "music_type": "Epic Cinematic",
+      "instruments": [
+        "Cinematic Drums",
+        "Percussion",
+        "Orchestral Elements"
+      ],
+      "music": {
+        "title": "Epical Drums 03",
+        "artist": "Mixkit",
+        "genre": "Epic Cinematic",
+        "duration": "",
+        "file": "assets/music/mixkit-epical-drums-03-678.mp3"
+      }
+    },
+    {
+      "id": "yoga",
+      "scene": "Meditation and Wellness",
+      "description": "A peaceful wellness environment designed around mindfulness, balance and inner calm.",
+      "emotion": "Peaceful",
+      "mood": [
+        "Calm",
+        "Peaceful",
+        "Reflective"
+      ],
+      "energy": 15,
+      "atmosphere": "Meditative",
+      "style": "Ambient",
+      "music_type": "Meditation",
+      "instruments": [
+        "Soft Pads",
+        "Flute",
+        "Ambient Tones"
+      ],
+      "music": {
+        "title": "Yoga Song",
+        "artist": "Mixkit",
+        "genre": "Meditation / Ambient",
+        "duration": "",
+        "file": "assets/music/mixkit-yoga-song-444.mp3"
+      }
+    },
+    {
+      "id": "cyberpunk-city",
+      "scene": "Neon Cyberpunk City",
+      "description": "A futuristic urban environment filled with neon lights, technology and digital energy.",
+      "emotion": "Futuristic",
+      "mood": [
+        "Futuristic",
+        "Energetic",
+        "Mysterious"
+      ],
+      "energy": 85,
+      "atmosphere": "Neon",
+      "style": "Cyberpunk",
+      "music_type": "Synthwave",
+      "instruments": [
+        "Synthesizer",
+        "Electronic Bass",
+        "Digital Drums"
+      ],
+      "music": {
+        "title": "Cyberpunk City",
+        "artist": "Mixkit",
+        "genre": "Cyberpunk / Synthwave",
+        "duration": "",
+        "file": "assets/music/mixkit-cyberpunk-city-140.mp3"
+      }
+    },
+    {
+      "id": "fallen-asper",
+      "scene": "Dark Emotional Environment",
+      "description": "A darker cinematic atmosphere with an introspective and emotional character.",
+      "emotion": "Melancholic",
+      "mood": [
+        "Dark",
+        "Melancholic",
+        "Reflective"
+      ],
+      "energy": 40,
+      "atmosphere": "Moody",
+      "style": "Cinematic",
+      "music_type": "Dark Ambient",
+      "instruments": [
+        "Piano",
+        "Dark Pads",
+        "Strings"
+      ],
+      "music": {
+        "title": "Fallen Asper",
+        "artist": "Mixkit",
+        "genre": "Dark Cinematic",
+        "duration": "",
+        "file": "assets/music/mixkit-fallen-asper-565.mp3"
+      }
+    },
+    {
+      "id": "infected-vibes",
+      "scene": "Dark Neon Environment",
+      "description": "A mysterious digital atmosphere with dark energy and an intense futuristic feeling.",
+      "emotion": "Mysterious",
+      "mood": [
+        "Dark",
+        "Mysterious",
+        "Futuristic"
+      ],
+      "energy": 78,
+      "atmosphere": "Dark Neon",
+      "style": "Electronic",
+      "music_type": "Dark Electronic",
+      "instruments": [
+        "Synth Bass",
+        "Electronic Drums",
+        "Synthesizer"
+      ],
+      "music": {
+        "title": "Infected Vibes",
+        "artist": "Mixkit",
+        "genre": "Dark Electronic",
+        "duration": "",
+        "file": "assets/music/mixkit-infected-vibes-157.mp3"
+      }
+    },
+    {
+      "id": "serene-view",
+      "scene": "Peaceful Landscape",
+      "description": "A beautiful natural landscape creating a serene, spacious and peaceful feeling.",
+      "emotion": "Serene",
+      "mood": [
+        "Peaceful",
+        "Dreamy",
+        "Relaxed"
+      ],
+      "energy": 25,
+      "atmosphere": "Serene",
+      "style": "Ambient",
+      "music_type": "Nature Ambient",
+      "instruments": [
+        "Soft Piano",
+        "Warm Pads",
+        "Nature Sounds"
+      ],
+      "music": {
+        "title": "Serene View",
+        "artist": "Mixkit",
+        "genre": "Ambient",
+        "duration": "",
+        "file": "assets/music/mixkit-serene-view-443.mp3"
+      }
+    },
+    {
+      "id": "classical",
+      "scene": "Elegant Classical Environment",
+      "description": "An elegant and thoughtful atmosphere suited to artistic, historical or sophisticated visuals.",
+      "emotion": "Elegant",
+      "mood": [
+        "Elegant",
+        "Reflective",
+        "Peaceful"
+      ],
+      "energy": 30,
+      "atmosphere": "Sophisticated",
+      "style": "Classical",
+      "music_type": "Classical",
+      "instruments": [
+        "Piano",
+        "Strings",
+        "Orchestral Instruments"
+      ],
+      "music": {
+        "title": "Classical 3",
+        "artist": "Mixkit",
+        "genre": "Classical",
+        "duration": "",
+        "file": "assets/music/mixkit-classical-3-710.mp3"
+      }
+    },
+    {
+      "id": "valley-sunset",
+      "scene": "Sunset Valley",
+      "description": "A warm sunset landscape creating a dreamy, peaceful and hopeful atmosphere.",
+      "emotion": "Dreamy",
+      "mood": [
+        "Dreamy",
+        "Warm",
+        "Hopeful"
+      ],
+      "energy": 25,
+      "atmosphere": "Golden Hour",
+      "style": "Cinematic",
+      "music_type": "Ambient Cinematic",
+      "instruments": [
+        "Soft Piano",
+        "Warm Pads",
+        "Ambient Textures"
+      ],
+      "music": {
+        "title": "Valley Sunset",
+        "artist": "Mixkit",
+        "genre": "Cinematic Ambient",
+        "duration": "",
+        "file": "assets/music/mixkit-valley-sunset-127.mp3"
+      }
+    },
+    {
+      "id": "this-is-seeb-haus",
+      "scene": "Modern Party Environment",
+      "description": "A modern upbeat environment filled with movement, social energy and a lively atmosphere.",
+      "emotion": "Excited",
+      "mood": [
+        "Excited",
+        "Energetic",
+        "Joyful"
+      ],
+      "energy": 88,
+      "atmosphere": "Upbeat",
+      "style": "Electronic",
+      "music_type": "Dance Pop",
+      "instruments": [
+        "Electronic Drums",
+        "Bass",
+        "Synthesizer"
+      ],
+      "music": {
+        "title": "This Is Seeb Haus",
+        "artist": "Mixkit",
+        "genre": "Electronic / Dance",
+        "duration": "",
+        "file": "assets/music/mixkit-this-is-seeb-haus-631.mp3"
+      }
+    }
+  ]
 }
