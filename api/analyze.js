@@ -1,5 +1,9 @@
 export default async function handler(req, res) {
-    // Allow POST requests only
+
+    // =====================================================
+    // ALLOW POST ONLY
+    // =====================================================
+
     if (req.method !== "POST") {
         return res.status(405).json({
             error: "Method not allowed"
@@ -7,27 +11,32 @@ export default async function handler(req, res) {
     }
 
     try {
+
         const { image, mode } = req.body;
 
-        // Check image
+        // =====================================================
+        // CHECK IMAGE
+        // =====================================================
+
         if (!image) {
             return res.status(400).json({
                 error: "No image was provided"
             });
         }
 
-        // Check API key
+        // =====================================================
+        // CHECK API KEY
+        // =====================================================
+
         if (!process.env.OPENROUTER_API_KEY) {
             return res.status(500).json({
                 error: "OpenRouter API key is not configured"
             });
         }
 
-        /*
-         * =====================================================
-         * AI PROMPT
-         * =====================================================
-         */
+        // =====================================================
+        // PROMPT
+        // =====================================================
 
         let prompt;
 
@@ -36,45 +45,33 @@ export default async function handler(req, res) {
             prompt = `
 You are the AI Story Engine for AuraTune.
 
-Look carefully at the uploaded image and create
-a short cinematic story inspired by what you see.
+Look carefully at the uploaded image.
 
-The story should feel emotional, imaginative and
-connected to the visual atmosphere of the image.
+Create a short cinematic story inspired by
+the visual atmosphere of the image.
 
 Return ONLY valid JSON.
 
 Use exactly this structure:
 
 {
-  "title": "string",
-  "text": "string"
+  "title": "A short cinematic title",
+  "text": "The story goes here."
 }
 
 Rules:
 
-1. title:
-Create a short cinematic title.
-Keep it between 3 and 8 words.
-
-2. text:
-Write a short cinematic story inspired by the image.
-Keep it between 80 and 140 words.
-
-3. The story should describe the atmosphere,
-environment and possible feeling of the scene.
-
-4. You may creatively imagine events or characters,
-but do not claim that fictional details are definitely
-real facts about the image.
-
-5. Keep the story suitable for a general audience.
-
-6. Make the writing natural and engaging.
-
-Do not use Markdown.
-Do not add explanations.
-Return JSON only.
+- title must contain 3 to 8 words.
+- text must contain approximately 80 to 140 words.
+- Make the story emotional, imaginative and cinematic.
+- Describe the atmosphere and environment visible in the image.
+- You may creatively imagine events or characters.
+- Do not claim imaginary details are confirmed facts.
+- Keep the story suitable for a general audience.
+- Do not use Markdown.
+- Do not use code blocks.
+- Do not add explanations.
+- Return JSON only.
 `;
 
         } else {
@@ -83,8 +80,7 @@ Return JSON only.
 You are the AI vision engine for AuraTune.
 
 Analyze the uploaded image and determine
-what kind of music would best match its
-visual atmosphere.
+what kind of music best matches its visual atmosphere.
 
 Return ONLY valid JSON.
 
@@ -110,27 +106,14 @@ Use exactly this structure:
 
 Rules:
 
-1. scene:
-Describe the main visual environment.
-
-2. description:
-Give a short description of the atmosphere.
-
-3. mood:
-Return exactly 3 mood words.
-
-4. energy:
-Return a number between 0 and 100.
-
-5. style:
-Choose an appropriate music style.
-
-6. music_type:
-Choose an appropriate music category.
-
-7. instruments:
-Return exactly 3 suitable instruments,
-sounds or musical elements.
+- scene: describe the main visual environment.
+- description: describe the atmosphere.
+- mood: exactly 3 mood words.
+- energy: number from 0 to 100.
+- style: appropriate music style.
+- music_type: appropriate music category.
+- instruments: exactly 3 suitable instruments,
+  sounds or musical elements.
 
 Examples:
 
@@ -155,18 +138,15 @@ Natural, Relaxing, Refreshing
 Organic Ambient
 
 Do not use Markdown.
+Do not use code blocks.
 Do not add explanations.
 Return JSON only.
 `;
-
         }
 
-
-        /*
-         * =====================================================
-         * SEND IMAGE TO OPENROUTER
-         * =====================================================
-         */
+        // =====================================================
+        // SEND IMAGE TO OPENROUTER
+        // =====================================================
 
         const response = await fetch(
             "https://openrouter.ai/api/v1/chat/completions",
@@ -188,6 +168,7 @@ Return JSON only.
 
                 body: JSON.stringify({
 
+                    // Vision-capable model
                     model: "openrouter/free",
 
                     messages: [
@@ -195,6 +176,7 @@ Return JSON only.
                             role: "user",
 
                             content: [
+
                                 {
                                     type: "text",
                                     text: prompt
@@ -207,6 +189,7 @@ Return JSON only.
                                         url: image
                                     }
                                 }
+
                             ]
                         }
                     ]
@@ -215,22 +198,15 @@ Return JSON only.
             }
         );
 
+        // =====================================================
+        // READ OPENROUTER RESPONSE
+        // =====================================================
 
-        /*
-         * =====================================================
-         * OPENROUTER RESPONSE
-         * =====================================================
-         */
+        const data = await response.json();
 
-        const data =
-            await response.json();
-
-
-        /*
-         * =====================================================
-         * API ERROR
-         * =====================================================
-         */
+        // =====================================================
+        // OPENROUTER ERROR
+        // =====================================================
 
         if (!response.ok) {
 
@@ -248,157 +224,159 @@ Return JSON only.
                     "OpenRouter request failed"
 
             });
-
         }
 
+        // =====================================================
+        // GET AI OUTPUT
+        // =====================================================
 
-        /*
-         * =====================================================
-         * GET AI OUTPUT
-         * =====================================================
-         */
-
-        const output =
+        let output =
             data?.choices?.[0]?.message?.content;
-            console.log(
-    "RAW AI OUTPUT:",
-    output
-);
 
+        console.log(
+            "RAW AI OUTPUT:",
+            output
+        );
 
         if (!output) {
 
             return res.status(500).json({
-
                 error:
                     "No response was returned by the AI"
-
-            });
-
-        }
-
-
-        /*
-         * =====================================================
-         * CLEAN AI OUTPUT
-         * =====================================================
-         */
-        const cleanedOutput = output
-    .replace(/```json/gi, "")
-    .replace(/```/g, "")
-    .trim();
-
-let result;
-
-try {
-    result = JSON.parse(cleanedOutput);
-} catch (error) {
-
-    console.error(
-        "Invalid AI JSON. Raw output:",
-        output
-    );
-
-    // Try to extract the JSON object from extra AI text
-    const jsonMatch =
-        cleanedOutput.match(/\{[\s\S]*\}/);
-
-    if (jsonMatch) {
-
-        try {
-            result = JSON.parse(
-                jsonMatch[0]
-            );
-        } catch (secondError) {
-
-            return res.status(500).json({
-                error:
-                    "AI returned invalid JSON"
             });
         }
 
-    } else {
+        // =====================================================
+        // HANDLE POSSIBLE ARRAY CONTENT
+        // =====================================================
 
-        return res.status(500).json({
-            error:
-                "AI returned invalid JSON"
-        });
-    }
-}
-        
+        if (Array.isArray(output)) {
 
-        /*
-         * =====================================================
-         * PARSE JSON
-         * =====================================================
-         */
+            output = output
+                .map(item => item?.text || "")
+                .join("");
+
+        }
+
+        // Make sure output is a string
+        output = String(output).trim();
+
+        // =====================================================
+        // CLEAN AI OUTPUT
+        // =====================================================
+
+        let cleanedOutput = output
+            .replace(/```json/gi, "")
+            .replace(/```/g, "")
+            .trim();
+
+        // =====================================================
+        // PARSE JSON
+        // =====================================================
 
         let result;
 
         try {
 
-            result =
-                JSON.parse(cleanedOutput);
+            result = JSON.parse(cleanedOutput);
 
         } catch (error) {
 
             console.error(
-                "Invalid AI JSON:",
+                "Direct JSON parsing failed:"
+            );
+
+            console.error(
                 cleanedOutput
             );
 
-            return res.status(500).json({
+            // =================================================
+            // TRY TO FIND JSON OBJECT
+            // =================================================
 
-                error:
-                    "AI returned invalid JSON"
+            const start =
+                cleanedOutput.indexOf("{");
 
-            });
+            const end =
+                cleanedOutput.lastIndexOf("}");
 
+            if (
+                start !== -1 &&
+                end !== -1 &&
+                end > start
+            ) {
+
+                const possibleJSON =
+                    cleanedOutput.substring(
+                        start,
+                        end + 1
+                    );
+
+                try {
+
+                    result =
+                        JSON.parse(
+                            possibleJSON
+                        );
+
+                } catch (secondError) {
+
+                    console.error(
+                        "JSON extraction failed:",
+                        possibleJSON
+                    );
+
+                    return res.status(500).json({
+                        error:
+                            "AI returned invalid JSON"
+                    });
+                }
+
+            } else {
+
+                return res.status(500).json({
+                    error:
+                        "AI returned invalid JSON"
+                });
+            }
         }
 
-
-        /*
-         * =====================================================
-         * STORY MODE RESPONSE
-         * =====================================================
-         */
+        // =====================================================
+        // STORY MODE RESPONSE
+        // =====================================================
 
         if (mode === "story") {
 
             if (
+                !result ||
                 !result.title ||
                 !result.text
             ) {
 
                 return res.status(500).json({
-
                     error:
                         "AI returned an incomplete story"
-
                 });
-
             }
-
 
             return res.status(200).json({
 
                 success: true,
 
                 story: {
-                    title: result.title,
-                    text: result.text
+                    title:
+                        String(result.title),
+
+                    text:
+                        String(result.text)
                 }
 
             });
-
         }
 
-
-        /*
-         * =====================================================
-         * NORMAL AURATUNE ANALYSIS RESPONSE
-         * =====================================================
-         */
+        // =====================================================
+        // NORMAL AURATUNE ANALYSIS
+        // =====================================================
 
         return res.status(200).json({
 
@@ -407,7 +385,6 @@ try {
             analysis: result
 
         });
-
 
     } catch (error) {
 
@@ -422,6 +399,5 @@ try {
                 "AuraTune image analysis failed"
 
         });
-
     }
 }
