@@ -1787,6 +1787,368 @@ document.addEventListener(
             );
 
         }
+    /* =========================================================
+   AI STORY MODE
+========================================================= */
 
+const storyImageInput =
+    document.getElementById("storyImageInput");
+
+const storyUploadBox =
+    document.querySelector(".story-upload-box");
+
+const storyPreview =
+    document.getElementById("storyPreview");
+
+const storyPreviewImage =
+    document.getElementById("storyPreviewImage");
+
+const storyRemoveBtn =
+    document.getElementById("storyRemoveBtn");
+
+const storyGenerateBtn =
+    document.getElementById("storyGenerateBtn");
+
+const storyResult =
+    document.getElementById("storyResult");
+
+const storyTitle =
+    document.getElementById("storyTitle");
+
+const storyText =
+    document.getElementById("storyText");
+
+let storyImageURL = null;
+
+
+/* =========================================================
+   STORY IMAGE UPLOAD
+========================================================= */
+
+if (storyImageInput) {
+
+    storyImageInput.addEventListener(
+        "change",
+        handleStoryImageUpload
+    );
+
+}
+
+
+function handleStoryImageUpload(event) {
+
+    const file =
+        event.target.files?.[0];
+
+    if (!file) {
+        return;
+    }
+
+
+    if (!file.type.startsWith("image/")) {
+
+        alert(
+            "Please upload a valid image."
+        );
+
+        return;
+
+    }
+
+
+    if (storyImageURL) {
+
+        URL.revokeObjectURL(
+            storyImageURL
+        );
+
+    }
+
+
+    storyImageURL =
+        URL.createObjectURL(file);
+
+
+    if (storyPreviewImage) {
+
+        storyPreviewImage.src =
+            storyImageURL;
+
+    }
+
+
+    if (storyUploadBox) {
+
+        storyUploadBox.style.display =
+            "none";
+
+    }
+
+
+    if (storyPreview) {
+
+        storyPreview.hidden =
+            false;
+
+    }
+
+
+    if (storyGenerateBtn) {
+
+        storyGenerateBtn.disabled =
+            false;
+
+    }
+
+
+    if (storyResult) {
+
+        storyResult.hidden =
+            true;
+
+    }
+
+}
+
+
+/* =========================================================
+   REMOVE STORY IMAGE
+========================================================= */
+
+if (storyRemoveBtn) {
+
+    storyRemoveBtn.addEventListener(
+        "click",
+        resetStoryMode
+    );
+
+}
+
+
+function resetStoryMode() {
+
+    if (storyImageURL) {
+
+        URL.revokeObjectURL(
+            storyImageURL
+        );
+
+        storyImageURL = null;
+
+    }
+
+
+    if (storyImageInput) {
+
+        storyImageInput.value = "";
+
+    }
+
+
+    if (storyPreviewImage) {
+
+        storyPreviewImage.src = "";
+
+    }
+
+
+    if (storyPreview) {
+
+        storyPreview.hidden =
+            true;
+
+    }
+
+
+    if (storyUploadBox) {
+
+        storyUploadBox.style.display =
+            "";
+
+    }
+
+
+    if (storyGenerateBtn) {
+
+        storyGenerateBtn.disabled =
+            true;
+
+    }
+
+
+    if (storyResult) {
+
+        storyResult.hidden =
+            true;
+
+    }
+
+}
+
+
+/* =========================================================
+   GENERATE STORY
+========================================================= */
+
+if (storyGenerateBtn) {
+
+    storyGenerateBtn.addEventListener(
+        "click",
+        generateStory
+    );
+
+}
+
+
+async function generateStory() {
+
+    const file =
+        storyImageInput?.files?.[0];
+
+
+    if (!file) {
+
+        alert(
+            "Please upload an image first."
+        );
+
+        return;
+
+    }
+
+
+    storyGenerateBtn.disabled =
+        true;
+
+    storyGenerateBtn.classList.add(
+        "loading"
+    );
+
+
+    storyGenerateBtn.innerHTML = `
+        <span>✦</span>
+        Creating your story...
+    `;
+
+
+    try {
+
+        const imageBase64 =
+            await fileToBase64(file);
+
+
+        const response =
+            await fetch(
+                "/api/analyze",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        image: imageBase64,
+                        mode: "story"
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data?.error ||
+                "Could not generate the story."
+            );
+
+        }
+
+
+        const story =
+            data?.story;
+
+
+        if (!story) {
+
+            throw new Error(
+                "The AI did not return a story."
+            );
+
+        }
+
+
+        if (storyTitle) {
+
+            storyTitle.textContent =
+                story.title ||
+                "A Moment Worth Remembering";
+
+        }
+
+
+        if (storyText) {
+
+            storyText.textContent =
+                story.text ||
+                story.story ||
+                "";
+
+        }
+
+
+        if (storyResult) {
+
+            storyResult.hidden =
+                false;
+
+
+            storyResult.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "AuraTune Story Error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Something went wrong while creating your story."
+        );
+
+
+    } finally {
+
+        storyGenerateBtn.disabled =
+            false;
+
+
+        storyGenerateBtn.classList.remove(
+            "loading"
+        );
+
+
+        storyGenerateBtn.innerHTML = `
+            <span>✦</span>
+            Generate My Story
+            <span>→</span>
+        `;
+
+    }
+
+}
     }
 );

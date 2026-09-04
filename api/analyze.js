@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { image } = req.body;
+        const { image, mode } = req.body;
 
         // Check image
         if (!image) {
@@ -23,34 +23,63 @@ export default async function handler(req, res) {
             });
         }
 
-        // Send image to OpenRouter
-        const response = await fetch(
-            "https://openrouter.ai/api/v1/chat/completions",
-            {
-                method: "POST",
+        /*
+         * =====================================================
+         * AI PROMPT
+         * =====================================================
+         */
 
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization":
-                        `Bearer ${process.env.OPENROUTER_API_KEY}`,
-                    "HTTP-Referer":
-                        "https://auratune-two.vercel.app/",
-                    "X-Title":
-                        "AuraTune"
-                },
+        let prompt;
 
-                body: JSON.stringify({
-                    model: "openrouter/free",
+        if (mode === "story") {
 
-                    messages: [
-                        {
-                            role: "user",
+            prompt = `
+You are the AI Story Engine for AuraTune.
 
-                            content: [
-                                {
-                                    type: "text",
+Look carefully at the uploaded image and create
+a short cinematic story inspired by what you see.
 
-                                    text: `
+The story should feel emotional, imaginative and
+connected to the visual atmosphere of the image.
+
+Return ONLY valid JSON.
+
+Use exactly this structure:
+
+{
+  "title": "string",
+  "text": "string"
+}
+
+Rules:
+
+1. title:
+Create a short cinematic title.
+Keep it between 3 and 8 words.
+
+2. text:
+Write a short cinematic story inspired by the image.
+Keep it between 80 and 140 words.
+
+3. The story should describe the atmosphere,
+environment and possible feeling of the scene.
+
+4. You may creatively imagine events or characters,
+but do not claim that fictional details are definitely
+real facts about the image.
+
+5. Keep the story suitable for a general audience.
+
+6. Make the writing natural and engaging.
+
+Do not use Markdown.
+Do not add explanations.
+Return JSON only.
+`;
+
+        } else {
+
+            prompt = `
 You are the AI vision engine for AuraTune.
 
 Analyze the uploaded image and determine
@@ -128,7 +157,47 @@ Organic Ambient
 Do not use Markdown.
 Do not add explanations.
 Return JSON only.
-`
+`;
+
+        }
+
+
+        /*
+         * =====================================================
+         * SEND IMAGE TO OPENROUTER
+         * =====================================================
+         */
+
+        const response = await fetch(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+
+                    "Authorization":
+                        `Bearer ${process.env.OPENROUTER_API_KEY}`,
+
+                    "HTTP-Referer":
+                        "https://auratune-two.vercel.app/",
+
+                    "X-Title":
+                        "AuraTune"
+                },
+
+                body: JSON.stringify({
+
+                    model: "openrouter/free",
+
+                    messages: [
+                        {
+                            role: "user",
+
+                            content: [
+                                {
+                                    type: "text",
+                                    text: prompt
                                 },
 
                                 {
@@ -141,15 +210,30 @@ Return JSON only.
                             ]
                         }
                     ]
+
                 })
             }
         );
 
-        // Convert OpenRouter response to JSON
-        const data = await response.json();
 
-        // Handle API errors
+        /*
+         * =====================================================
+         * OPENROUTER RESPONSE
+         * =====================================================
+         */
+
+        const data =
+            await response.json();
+
+
+        /*
+         * =====================================================
+         * API ERROR
+         * =====================================================
+         */
+
         if (!response.ok) {
+
             console.error(
                 "OpenRouter error:",
                 data
@@ -158,53 +242,132 @@ Return JSON only.
             return res.status(
                 response.status
             ).json({
+
                 error:
                     data?.error?.message ||
                     "OpenRouter request failed"
+
             });
+
         }
 
-        // Get AI response
+
+        /*
+         * =====================================================
+         * GET AI OUTPUT
+         * =====================================================
+         */
+
         const output =
             data?.choices?.[0]?.message?.content;
 
+
         if (!output) {
+
             return res.status(500).json({
+
                 error:
-                    "No analysis was returned by the AI"
+                    "No response was returned by the AI"
+
             });
+
         }
 
-        // Remove possible Markdown code fences
+
+        /*
+         * =====================================================
+         * CLEAN AI OUTPUT
+         * =====================================================
+         */
+
         const cleanedOutput =
             output
                 .replace(/```json/gi, "")
                 .replace(/```/g, "")
                 .trim();
 
-        // Convert AI response to JSON
-        let analysis;
+
+        /*
+         * =====================================================
+         * PARSE JSON
+         * =====================================================
+         */
+
+        let result;
 
         try {
-            analysis =
+
+            result =
                 JSON.parse(cleanedOutput);
+
         } catch (error) {
+
             console.error(
                 "Invalid AI JSON:",
                 cleanedOutput
             );
 
             return res.status(500).json({
+
                 error:
                     "AI returned invalid JSON"
+
             });
+
         }
 
-        // Send result back to AuraTune
+
+        /*
+         * =====================================================
+         * STORY MODE RESPONSE
+         * =====================================================
+         */
+
+        if (mode === "story") {
+
+            if (
+                !result.title ||
+                !result.text
+            ) {
+
+                return res.status(500).json({
+
+                    error:
+                        "AI returned an incomplete story"
+
+                });
+
+            }
+
+
+            return res.status(200).json({
+
+                success: true,
+
+                story: {
+                    title: result.title,
+                    text: result.text
+                }
+
+            });
+
+        }
+
+
+        /*
+         * =====================================================
+         * NORMAL AURATUNE ANALYSIS RESPONSE
+         * =====================================================
+         */
+
         return res.status(200).json({
+
             success: true,
-            analysis: analysis
+
+            analysis: result
+
         });
+
 
     } catch (error) {
 
@@ -214,8 +377,11 @@ Return JSON only.
         );
 
         return res.status(500).json({
+
             error:
                 "AuraTune image analysis failed"
+
         });
+
     }
 }
