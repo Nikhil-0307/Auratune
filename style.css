@@ -2664,3 +2664,468 @@ MOBILE
 
 
 }
+/* =========================================================
+FUTURE FEATURE — AI STORY MODE
+========================================================= */
+
+.future-section {
+position: relative;
+width: 100%;
+padding: 90px 6%;
+overflow: hidden;
+}
+
+.future-card {
+position: relative;
+max-width: 1100px;
+min-height: 420px;
+margin: 0 auto;
+display: flex;
+align-items: center;
+justify-content: center;
+
+padding: 70px 8%;
+
+border: 1px solid rgba(255, 255, 255, 0.10);
+border-radius: 32px;
+
+background:
+    radial-gradient(
+        circle at 85% 20%,
+        rgba(130, 90, 255, 0.12),
+        transparent 35%
+    ),
+    linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.055),
+        rgba(255, 255, 255, 0.012)
+    );
+
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+
+box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.28);
+
+overflow: hidden;
+
+
+}
+
+/* Decorative glow */
+
+.future-card::before {
+content: "";
+
+
+position: absolute;
+
+width: 280px;
+height: 280px;
+
+top: -140px;
+right: -80px;
+
+border-radius: 50%;
+
+background: rgba(150, 100, 255, 0.18);
+
+filter: blur(80px);
+
+pointer-events: none;
+
+
+}
+
+/* Content */
+
+.future-content {
+position: relative;
+z-index: 2;
+
+
+max-width: 780px;
+
+text-align: center;
+
+
+}
+
+/* Coming soon badge */
+
+.future-badge {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+
+
+margin-bottom: 22px;
+padding: 8px 14px;
+
+border: 1px solid rgba(255, 255, 255, 0.12);
+border-radius: 999px;
+
+background: rgba(255, 255, 255, 0.04);
+
+font-size: 0.65rem;
+font-weight: 700;
+
+letter-spacing: 0.14em;
+
+opacity: 0.75;
+
+
+}
+
+/* Badge dot */
+
+.future-dot {
+width: 6px;
+height: 6px;
+
+
+border-radius: 50%;
+
+background: currentColor;
+
+box-shadow:
+    0 0 10px currentColor;
+
+animation: futurePulse 2s ease-in-out infinite;
+
+
+}
+
+@keyframes futurePulse {
+
+
+0%,
+100% {
+    opacity: 0.35;
+    transform: scale(0.8);
+}
+
+50% {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+
+}
+
+/* Small heading */
+
+.future-content .section-label {
+display: block;
+
+
+margin-bottom: 12px;
+
+font-size: 0.7rem;
+letter-spacing: 0.18em;
+
+
+}
+
+/* Main heading */
+
+.future-content h2 {
+margin: 0;
+
+
+font-size: clamp(2.5rem, 6vw, 5rem);
+
+line-height: 0.98;
+
+letter-spacing: -0.055em;
+
+
+}
+
+.future-content h2 span {
+display: block;
+}
+
+/* Description */
+
+.future-description {
+max-width: 650px;
+
+
+margin: 25px auto 0;
+
+font-size: 1rem;
+line-height: 1.8;
+
+opacity: 0.62;
+
+
+}
+
+/* Future process */
+
+.future-flow {
+display: flex;
+align-items: center;
+justify-content: center;
+margin-top: 40px;
+
+gap: 18px;
+
+
+}
+
+.future-step {
+display: flex;
+flex-direction: column;
+gap: 6px;
+text-align: left;
+
+
+}
+
+.future-step span {
+font-size: 0.62rem;
+letter-spacing: 0.15em;
+
+
+opacity: 0.4;
+
+
+}
+
+.future-step strong {
+font-size: 0.7rem;
+letter-spacing: 0.12em;
+
+
+font-weight: 600;
+
+
+}
+
+/* Lines between steps */
+
+.future-line {
+width: 45px;
+height: 1px;
+
+
+background: rgba(255, 255, 255, 0.15);
+
+
+}
+
+/* Feature tag */
+
+.future-tag {
+display: inline-block;
+
+
+margin-top: 35px;
+
+padding: 9px 16px;
+
+border: 1px solid rgba(255, 255, 255, 0.09);
+border-radius: 999px;
+
+font-size: 0.65rem;
+
+letter-spacing: 0.13em;
+
+opacity: 0.45;
+
+
+}
+
+/* =========================================================
+ORBIT DECORATION
+========================================================= */
+
+.future-orbit {
+position: absolute;
+
+
+width: 420px;
+height: 420px;
+
+right: -170px;
+bottom: -210px;
+
+border: 1px solid rgba(255, 255, 255, 0.06);
+
+border-radius: 50%;
+
+animation: futureRotate 25s linear infinite;
+
+pointer-events: none;
+
+
+}
+
+.future-orbit::before {
+content: "";
+
+
+position: absolute;
+
+inset: 45px;
+
+border: 1px solid rgba(255, 255, 255, 0.05);
+
+border-radius: 50%;
+
+
+}
+
+.future-orbit::after {
+content: "";
+
+
+position: absolute;
+
+inset: 100px;
+
+border: 1px solid rgba(255, 255, 255, 0.04);
+
+border-radius: 50%;
+
+
+}
+
+.future-orbit span {
+position: absolute;
+
+
+width: 7px;
+height: 7px;
+
+border-radius: 50%;
+
+background: currentColor;
+
+box-shadow:
+    0 0 15px currentColor;
+
+
+}
+
+.future-orbit span:nth-child(1) {
+top: 30px;
+left: 50%;
+}
+
+.future-orbit span:nth-child(2) {
+right: 40px;
+top: 45%;
+}
+
+.future-orbit span:nth-child(3) {
+bottom: 45px;
+left: 30%;
+}
+
+@keyframes futureRotate {
+from {
+transform: rotate(0deg);
+}
+
+
+to {
+    transform: rotate(360deg);
+}
+
+
+}
+
+/* =========================================================
+LIGHT MODE
+========================================================= */
+
+body.light-mode .future-card {
+border-color: rgba(0, 0, 0, 0.09);
+
+
+background:
+    radial-gradient(
+        circle at 85% 20%,
+        rgba(130, 90, 255, 0.08),
+        transparent 35%
+    ),
+    rgba(255, 255, 255, 0.65);
+
+box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.08);
+
+
+}
+
+body.light-mode .future-badge {
+border-color: rgba(0, 0, 0, 0.10);
+background: rgba(0, 0, 0, 0.025);
+}
+
+body.light-mode .future-line {
+background: rgba(0, 0, 0, 0.12);
+}
+
+body.light-mode .future-orbit {
+border-color: rgba(0, 0, 0, 0.06);
+}
+
+/* =========================================================
+MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+
+.future-section {
+    padding: 65px 5%;
+}
+
+.future-card {
+    min-height: auto;
+
+    padding: 55px 24px;
+
+    border-radius: 24px;
+}
+
+.future-content h2 {
+    font-size: 2.7rem;
+}
+
+.future-description {
+    font-size: 0.9rem;
+    line-height: 1.7;
+}
+
+.future-flow {
+    flex-direction: column;
+
+    gap: 15px;
+
+    align-items: center;
+}
+
+.future-step {
+    text-align: center;
+    align-items: center;
+}
+
+.future-line {
+    width: 1px;
+    height: 25px;
+}
+
+.future-orbit {
+    width: 300px;
+    height: 300px;
+
+    right: -150px;
+    bottom: -150px;
+}
+
+
+}
