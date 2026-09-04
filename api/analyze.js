@@ -260,6 +260,10 @@ Return JSON only.
 
         const output =
             data?.choices?.[0]?.message?.content;
+            console.log(
+    "RAW AI OUTPUT:",
+    output
+);
 
 
         if (!output) {
@@ -279,13 +283,49 @@ Return JSON only.
          * CLEAN AI OUTPUT
          * =====================================================
          */
+        const cleanedOutput = output
+    .replace(/```json/gi, "")
+    .replace(/```/g, "")
+    .trim();
 
-        const cleanedOutput =
-            output
-                .replace(/```json/gi, "")
-                .replace(/```/g, "")
-                .trim();
+let result;
 
+try {
+    result = JSON.parse(cleanedOutput);
+} catch (error) {
+
+    console.error(
+        "Invalid AI JSON. Raw output:",
+        output
+    );
+
+    // Try to extract the JSON object from extra AI text
+    const jsonMatch =
+        cleanedOutput.match(/\{[\s\S]*\}/);
+
+    if (jsonMatch) {
+
+        try {
+            result = JSON.parse(
+                jsonMatch[0]
+            );
+        } catch (secondError) {
+
+            return res.status(500).json({
+                error:
+                    "AI returned invalid JSON"
+            });
+        }
+
+    } else {
+
+        return res.status(500).json({
+            error:
+                "AI returned invalid JSON"
+        });
+    }
+}
+        
 
         /*
          * =====================================================
