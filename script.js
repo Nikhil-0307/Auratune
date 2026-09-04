@@ -2110,7 +2110,7 @@ async function generateStory() {
 
             storyResult.scrollIntoView({
                 behavior: "smooth",
-                block: "center"
+                block: "start"
             });
 
         }
